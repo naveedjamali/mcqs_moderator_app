@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/json_file_io.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models.dart';
 
@@ -694,21 +695,45 @@ class _HomepageState extends State<Homepage> {
                           //user canceled the picker
                           return;
                         }
-                        // Ask the user to enter a file name
-                        String? fileName = await _showFilenameDialog(context);
-
-                        if (fileName!.isEmpty) {
-                          // User canceled or entered an invalid filename
-                          return;
-                        }
 
                         // Create a file in the selected directory
                         String filePath =
-                            '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json';
+                            '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
+                                .toLowerCase();
 
                         File file = File(filePath);
 
                         await file.writeAsString(jsonEncode(questions));
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Examiter'),
+                              icon: const Icon(
+                                Icons.download_for_offline_sharp,
+                                color: Colors.green,
+                              ),
+                              content: Column(
+                                children: [
+                                  const Text('File saved successfully'),
+                                  TextButton(
+                                      onPressed: () {
+                                        Uri uri = Uri.file(filePath);
+                                        launchUrl(uri);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(filePath)),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text('OK'))
+                              ],
+                            );
+                          },
+                        );
 
                         // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
                       },

@@ -759,36 +759,6 @@ class _HomepageState extends State<Homepage> {
     super.dispose();
   }
 
-  Future<String?> _showFilenameDialog(BuildContext context) async {
-    TextEditingController controller = TextEditingController();
-
-    return showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter File Name'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(hintText: "File name"),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(controller.text);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void addQuestions() {
     topicID = topicController.text.trim();

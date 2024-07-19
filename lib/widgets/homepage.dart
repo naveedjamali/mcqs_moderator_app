@@ -797,8 +797,14 @@ class _HomepageState extends State<Homepage> {
     jsonInput = jsonInput.replaceAll('\r', ' ').replaceAll('\n', ' ');
     final l = json.decode(jsonInput);
 
-    questions.insertAll(questions.length,
-        List<Question>.from(l.map((model) => Question.fromJson(model))));
+
+    questions.insertAll(0, List<Question>.from(l.map((model) {
+      Question q = Question.fromJson(model);
+      q.topicId = topicID;
+      q.subjectId = subjectID;
+      return q;
+
+    })));
     setState(() {
       questions.shuffle();
       for (var element in questions) {

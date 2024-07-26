@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -19,6 +20,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  bool isJSON = true;
   FocusNode topicFocus = FocusNode();
   FocusNode subjectFocus = FocusNode();
   FocusNode inputFocus = FocusNode();
@@ -49,6 +51,42 @@ class _HomepageState extends State<Homepage> {
             "Examiter MCQs Moderator",
             style: TextStyle(color: Colors.white),
           ),
+          actions: [
+            const Text(
+              'Current Input Format: ',
+              style: TextStyle(color: Colors.white),
+            ),
+            SizedBox(
+              width: 50,
+              child: Text(
+                isJSON ? 'JSON' : 'CSV',
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            SizedBox(
+              width: 140,
+              height: 40,
+              child: MaterialButton(
+                color: Colors.white,
+                onPressed: () {
+                  setState(() {
+                    isJSON = !isJSON;
+                  });
+                },
+                child: Text(
+                  'Change to ${isJSON ? 'CSV' : 'JSON'}',
+                  style: const TextStyle(color: Colors.purple),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+          ],
         ),
         body: Column(
           children: [
@@ -188,11 +226,11 @@ class _HomepageState extends State<Homepage> {
                             const SizedBox(
                               width: 20,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                "Enter JSON to convert:",
-                                style: TextStyle(
+                                "Enter ${isJSON ? 'JSON' : 'CSV'} to convert:",
+                                style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -203,11 +241,11 @@ class _HomepageState extends State<Homepage> {
                                 child: TextField(
                                   style: const TextStyle(fontFamily: "Courier"),
                                   focusNode: inputFocus,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                       border: null,
                                       hintText:
-                                          "write or paste your json here...",
-                                      hintStyle: TextStyle(
+                                          "write or paste your ${isJSON ? 'JSON' : 'CSV'} here...",
+                                      hintStyle: const TextStyle(
                                           fontWeight: FontWeight.w300,
                                           color: Colors.grey)),
                                   controller: jsonInputController,
@@ -759,22 +797,42 @@ class _HomepageState extends State<Homepage> {
     super.dispose();
   }
 
-
   void addQuestions() {
     topicID = topicController.text.trim();
     subjectID = subjectController.text.trim();
-    String jsonInput = jsonInputController.text.trim();
-    jsonInput = jsonInput.replaceAll('\r', ' ').replaceAll('\n', ' ');
-    final l = json.decode(jsonInput);
 
+    String input = jsonInputController.text.trim();
+    if (isJSON) {
+      input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
+      final l = json.decode(input);
+      questions.insertAll(
+        0,
+        List<Question>.from(
+          l.map(
+            (model) {
+              Question q = Question.fromJson(model);
+              q.topicId = topicID;
+              q.subjectId = subjectID;
+              return q;
+            },
+          ),
+        ),
+      );
+    } else {
+      List<List<dynamic>> rows =
+          const CsvToListConverter().convert(input, fieldDelimiter: ',,,');
+      for (List<dynamic> row in rows) {
+        Question q = Question();
+        q.body?.content = row[0];
+        for (int i = 1; i < row.length - 1; i++) {
+          q.answerOptions?.add(AnswerOptions(
+              body: Body(content: row[i], contentType: 'PLAIN'),
+              isCorrect: row[i] == row[row.length - 1]));
+        }
+        questions.add(q);
+      }
+    }
 
-    questions.insertAll(0, List<Question>.from(l.map((model) {
-      Question q = Question.fromJson(model);
-      q.topicId = topicID;
-      q.subjectId = subjectID;
-      return q;
-
-    })));
     setState(() {
       questions.shuffle();
       for (var element in questions) {

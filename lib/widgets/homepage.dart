@@ -37,7 +37,7 @@ class _HomepageState extends State<Homepage> {
   final jsonInputController = TextEditingController();
   String topicID = "";
   String subjectID = "";
-  String inputJson = "";
+  String inputText = "";
 
   List<Question> questions = [];
 
@@ -52,6 +52,98 @@ class _HomepageState extends State<Homepage> {
             style: TextStyle(color: Colors.white),
           ),
           actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextButton.icon(
+                style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.white)),
+                onPressed: () {
+                  setState(() {
+                    questions.shuffle();
+                  });
+                },
+                icon: const Icon(Icons.shuffle_on),
+                label: const Text('Shuffle Questions'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FilledButton.icon(
+                style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.green)),
+                onPressed: () {
+                  setState(() {
+                    for (var q in questions) {
+                      q.answerOptions?.shuffle();
+                    }
+                  });
+                },
+                icon: const Icon(Icons.shuffle),
+                label: const Text('Shuffle Answers'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FilledButton.icon(
+                onPressed: () {
+                  setState(() {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog.adaptive(
+                          icon: const Icon(
+                            Icons.warning,
+                            color: Colors.red,
+                          ),
+                          content: Text(
+                              'Do you want to remove all the ${questions.length} questions from the list?'),
+                          title: const Text('Warning'),
+                          actions: [
+                            FilledButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('No')),
+                            FilledButton(
+                                style: ButtonStyle(
+                                  foregroundColor: WidgetStateColor.resolveWith(
+                                    (states) {
+                                      return Colors.white;
+                                    },
+                                  ),
+                                  backgroundColor: WidgetStateColor.resolveWith(
+                                    (states) {
+                                      return Colors.red;
+                                    },
+                                  ),
+                                ),
+                                onPressed: () => setState(() {
+                                      questions.clear();
+                                      Navigator.of(context).pop();
+                                    }),
+                                child: const Text(
+                                  'Yes',
+                                ))
+                          ],
+                        );
+                      },
+                    );
+                  });
+                },
+                icon: const Icon(Icons.clear),
+                label: const Text('Clear Questions'),
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateColor.resolveWith(
+                    (states) {
+                      return Colors.white;
+                    },
+                  ),
+                  backgroundColor: WidgetStateColor.resolveWith(
+                    (states) {
+                      return Colors.red;
+                    },
+                  ),
+                ),
+              ),
+            ),
             const Text(
               'Current Input Format: ',
               style: TextStyle(color: Colors.white),
@@ -67,25 +159,23 @@ class _HomepageState extends State<Homepage> {
             const SizedBox(
               width: 20,
             ),
-            SizedBox(
-              width: 140,
-              height: 40,
-              child: MaterialButton(
-                color: Colors.white,
-                onPressed: () {
-                  setState(() {
-                    isJSON = !isJSON;
-                  });
-                },
-                child: Text(
-                  'Change to ${isJSON ? 'CSV' : 'JSON'}',
-                  style: const TextStyle(color: Colors.purple),
-                ),
-              ),
+            DropdownButton(
+              icon: Icon(Icons.arrow_drop_down),
+              value: isJSON ? 'JSON' : 'CSV',
+              items: <String>['JSON', 'CSV']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  isJSON = value == 'JSON';
+                });
+              },
             ),
-            const SizedBox(
-              width: 20,
-            ),
+
           ],
         ),
         body: Column(
@@ -108,40 +198,33 @@ class _HomepageState extends State<Homepage> {
                               children: [
                                 const Padding(
                                   padding: EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    width: 100,
-                                    child: Text(
-                                      "Topic ID",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  child: Text(
+                                    "Topic ID",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 Flexible(
                                   flex: 1,
-                                  child: SizedBox(
-                                    height: 50,
-                                    // width: 350,
-                                    child: TextField(
-                                      focusNode: topicFocus,
-                                      controller: topicController,
-                                      onChanged: (text) => {
-                                        setState(() {
-                                          topicID = topicController.text;
-                                        })
-                                      },
-                                      decoration: const InputDecoration(
-                                        hintText:
-                                            "Enter topic ID here e.g. c7918742-64a4-4767-bd29-3e23ed88d1c9",
-                                        hintStyle: TextStyle(
-                                            color: Colors.grey,
-                                            fontWeight: FontWeight.w400),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15),
-                                          ),
+                                  child: TextField(
+                                    focusNode: topicFocus,
+                                    controller: topicController,
+                                    onChanged: (text) => {
+                                      setState(() {
+                                        topicID = topicController.text;
+                                      })
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText:
+                                          "Enter topic ID here e.g. c7918742-64a4-4767-bd29-3e23ed88d1c9",
+                                      hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w400),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(15),
                                         ),
                                       ),
                                     ),
@@ -160,49 +243,36 @@ class _HomepageState extends State<Homepage> {
                                     color: Colors.red,
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 16,
-                            ),
-                            Row(
-                              children: [
                                 const Padding(
                                   padding: EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    width: 100,
-                                    child: Text(
-                                      "Subject ID",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  child: Text(
+                                    "Subject ID",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                                 Flexible(
                                   flex: 1,
-                                  child: SizedBox(
-                                    height: 50,
-                                    // width: 350,
-                                    child: TextField(
-                                      focusNode: subjectFocus,
-                                      controller: subjectController,
-                                      onChanged: (text) => {
-                                        setState(() {
-                                          subjectID = subjectController.text;
-                                        })
-                                      },
-                                      decoration: const InputDecoration(
-                                        hintText:
-                                            "Enter Subject ID here e.g. c7918742-64a4-4767-bd29-3e23ed88d1c9",
-                                        hintStyle: TextStyle(
-                                            color: Colors.grey,
-                                            fontWeight: FontWeight.w400),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(15),
-                                          ),
+                                  child: TextField(
+                                    focusNode: subjectFocus,
+                                    controller: subjectController,
+                                    canRequestFocus: true,
+                                    onChanged: (text) => {
+                                      setState(() {
+                                        subjectID = subjectController.text;
+                                      }),
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText:
+                                          "Enter Subject ID here e.g. c7918742-64a4-4767-bd29-3e23ed88d1c9",
+                                      hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w400),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(15),
                                         ),
                                       ),
                                     ),
@@ -222,6 +292,12 @@ class _HomepageState extends State<Homepage> {
                                   ),
                                 ),
                               ],
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            Row(
+                              children: [],
                             ),
                             const SizedBox(
                               width: 20,
@@ -257,7 +333,7 @@ class _HomepageState extends State<Homepage> {
                                   maxLines: null,
                                   onChanged: (text) {
                                     setState(() {
-                                      inputJson = jsonInputController.text;
+                                      inputText = jsonInputController.text;
                                     });
                                   },
                                 ),
@@ -268,7 +344,7 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                     Flexible(
-                      flex: 5,
+                      flex: 3,
                       child: Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -299,109 +375,6 @@ class _HomepageState extends State<Homepage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: FilledButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            questions.shuffle();
-                                          });
-                                        },
-                                        icon: const Icon(Icons.shuffle_on),
-                                        label: const Text('Shuffle Questions'),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: FilledButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            for (var q in questions) {
-                                              q.answerOptions?.shuffle();
-                                            }
-                                          });
-                                        },
-                                        icon: const Icon(Icons.shuffle),
-                                        label: const Text('Shuffle Answers'),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: FilledButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog.adaptive(
-                                                  icon: const Icon(
-                                                    Icons.warning,
-                                                    color: Colors.red,
-                                                  ),
-                                                  content: Text(
-                                                      'Do you want to remove all the ${questions.length} questions from the list?'),
-                                                  title: const Text('Warning'),
-                                                  actions: [
-                                                    FilledButton(
-                                                        onPressed: () =>
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop(),
-                                                        child:
-                                                            const Text('No')),
-                                                    FilledButton(
-                                                        style: ButtonStyle(
-                                                          foregroundColor:
-                                                              WidgetStateColor
-                                                                  .resolveWith(
-                                                            (states) {
-                                                              return Colors
-                                                                  .white;
-                                                            },
-                                                          ),
-                                                          backgroundColor:
-                                                              WidgetStateColor
-                                                                  .resolveWith(
-                                                            (states) {
-                                                              return Colors.red;
-                                                            },
-                                                          ),
-                                                        ),
-                                                        onPressed: () =>
-                                                            setState(() {
-                                                              questions.clear();
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            }),
-                                                        child: const Text(
-                                                          'Yes',
-                                                        ))
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          });
-                                        },
-                                        icon: const Icon(Icons.clear),
-                                        label:
-                                            const Text('Clear Questions List'),
-                                        style: ButtonStyle(
-                                          foregroundColor:
-                                              WidgetStateColor.resolveWith(
-                                            (states) {
-                                              return Colors.white;
-                                            },
-                                          ),
-                                          backgroundColor:
-                                              WidgetStateColor.resolveWith(
-                                            (states) {
-                                              return Colors.red;
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    )
                                   ],
                                 ),
                               ),
@@ -591,7 +564,7 @@ class _HomepageState extends State<Homepage> {
                       onPressed: () {
                         setState(() {
                           jsonInputController.text = "";
-                          inputJson = "";
+                          inputText = "";
                           inputFocus.requestFocus();
                         });
                       },
@@ -823,13 +796,20 @@ class _HomepageState extends State<Homepage> {
           const CsvToListConverter().convert(input, fieldDelimiter: ',,,');
       for (List<dynamic> row in rows) {
         Question q = Question();
-        q.body?.content = row[0];
+        Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
+        q.body = qBody;
+        q.answerOptions = [];
         for (int i = 1; i < row.length - 1; i++) {
-          q.answerOptions?.add(AnswerOptions(
-              body: Body(content: row[i], contentType: 'PLAIN'),
-              isCorrect: row[i] == row[row.length - 1]));
+          AnswerOptions answer = AnswerOptions(
+              body: Body(content: '${row[i]}', contentType: 'PLAIN'),
+              isCorrect: row[i] == row[row.length - 1]);
+          q.answerOptions?.add(answer);
         }
         questions.add(q);
+        q.subjectId = subjectID;
+        q.topicId = topicID;
+        q.assignedPoints = 1;
+        q.status = 'ACTIVE';
       }
     }
 

@@ -853,19 +853,20 @@ class _HomepageState extends State<Homepage> {
       input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
       final l = json.decode(input);
 
-      //
-      List<Question> tempList =  l.map(
-            (model) {
-          Question q = Question.fromJson(model);
-          q.topicId = topicID;
-          q.subjectId = subjectID;
 
-          return q;
-        },
-
-    ).toList();
-
-     ///////
+      questions.insertAll(
+        0,
+        List<Question>.from(
+          l.map(
+                (model) {
+              Question q = Question.fromJson(model);
+              q.topicId = topicID;
+              q.subjectId = subjectID;
+              return q;
+            },
+          ),
+        ),
+      );
     } else {
       List<List<dynamic>> rows =
           const CsvToListConverter().convert(input, fieldDelimiter: ',,,');

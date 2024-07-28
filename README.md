@@ -1,16 +1,12 @@
-# mcqs_moderator_app
+# MCQs Moderator App
+used by Examiter administration.
+## Screenshots
+![image](https://github.com/user-attachments/assets/14df421e-71d2-4f93-bedc-41fbcd5c0ee2)
 
-A new Flutter project.
+![image](https://github.com/user-attachments/assets/34eb2495-856c-4c82-af63-96f3a9905f6d)
 
-## Getting Started
+![image](https://github.com/user-attachments/assets/851ad802-cf65-4b26-9e04-86a2ec64256e)
+![image](https://github.com/user-attachments/assets/ac6c1e43-89d1-45bc-8474-ec51ef91e353)
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The project is the property of Team Effordea.
+The project is the part of Examiter App.

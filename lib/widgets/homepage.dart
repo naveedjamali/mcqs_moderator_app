@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/json_file_io.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models.dart';
@@ -21,6 +22,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   bool isJSON = true;
+  bool isAscendingOrder = true;
   FocusNode topicFocus = FocusNode();
   FocusNode subjectFocus = FocusNode();
   FocusNode inputFocus = FocusNode();
@@ -148,34 +150,39 @@ class _HomepageState extends State<Homepage> {
               'Current Input Format: ',
               style: TextStyle(color: Colors.white),
             ),
-            SizedBox(
-              width: 50,
-              child: Text(
-                isJSON ? 'JSON' : 'CSV',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
             const SizedBox(
               width: 20,
             ),
             DropdownButton(
-              icon: Icon(Icons.arrow_drop_down),
+              dropdownColor: Colors.purple,
+              elevation: 5,
+              hint: const Text('Change input format'),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+              underline: const Text(
+                '________________________',
+                style: TextStyle(color: Colors.white),
+              ),
+              icon: const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.white,
+              ),
               value: isJSON ? 'JSON' : 'CSV',
               items: <String>['JSON', 'CSV']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
+                  alignment: Alignment.bottomLeft,
                   value: value,
-                  child: Text(value),
+                  child: Center(child: Text(value)),
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
                   isJSON = value == 'JSON';
                 });
+                _savePreference(isJSON);
               },
             ),
-
           ],
         ),
         body: Column(
@@ -296,7 +303,7 @@ class _HomepageState extends State<Homepage> {
                             const SizedBox(
                               height: 16,
                             ),
-                            Row(
+                            const Row(
                               children: [],
                             ),
                             const SizedBox(
@@ -375,6 +382,12 @@ class _HomepageState extends State<Homepage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    IconButton(
+                                        onPressed: _sortByName,
+                                        icon: const Icon(Icons.sort_by_alpha)),
                                   ],
                                 ),
                               ),
@@ -392,123 +405,121 @@ class _HomepageState extends State<Homepage> {
                                     key: UniqueKey(),
                                     itemBuilder: (context, questionIndex) {
                                       return ListTile(
-                                        leading: IconButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  TextEditingController
-                                                      controller =
-                                                      TextEditingController();
-                                                  controller.text =
-                                                      questions[questionIndex]
-                                                              .body
-                                                              ?.content ??
-                                                          '';
-                                                  return AlertDialog.adaptive(
-                                                    title: const Text(
-                                                        'Edit Question'),
-                                                    content: TextField(
-                                                      controller: controller,
-                                                    ),
-                                                    actions: [
-                                                      TextButton.icon(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        label: const Text(
-                                                            'Cancel'),
-                                                        icon: const Icon(
-                                                          Icons.cancel,
-                                                          color: Colors.red,
-                                                        ),
+                                        title: ListTile(
+                                          leading: IconButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    TextEditingController
+                                                        controller =
+                                                        TextEditingController();
+                                                    controller.text =
+                                                        questions[questionIndex]
+                                                                .body
+                                                                ?.content ??
+                                                            '';
+                                                    return AlertDialog.adaptive(
+                                                      title: const Text(
+                                                          'Edit Question'),
+                                                      content: TextField(
+                                                        controller: controller,
                                                       ),
-                                                      TextButton.icon(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            questions[questionIndex]
-                                                                    .body
-                                                                    ?.content =
-                                                                controller.text;
+                                                      actions: [
+                                                        TextButton.icon(
+                                                          onPressed: () {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
-                                                          });
-                                                        },
-                                                        label:
-                                                            const Text('Save'),
-                                                        icon: const Icon(
-                                                          Icons.save,
-                                                          color: Colors.green,
+                                                          },
+                                                          label: const Text(
+                                                              'Cancel'),
+                                                          icon: const Icon(
+                                                            Icons.cancel,
+                                                            color: Colors.red,
+                                                          ),
                                                         ),
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                            icon: const Icon(Icons.edit)),
-                                        trailing: Column(
-                                          children: [
-                                            IconButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return AlertDialog
-                                                          .adaptive(
-                                                        title: const Text(
-                                                            'Delete this Question'),
-                                                        actions: [
-                                                          TextButton.icon(
-                                                            onPressed: () {
+                                                        TextButton.icon(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              questions[questionIndex]
+                                                                      .body
+                                                                      ?.content =
+                                                                  controller
+                                                                      .text;
                                                               Navigator.of(
                                                                       context)
                                                                   .pop();
-                                                            },
-                                                            label: const Text(
-                                                                'Cancel'),
-                                                            icon: const Icon(
-                                                              Icons.cancel,
-                                                              color:
-                                                                  Colors.grey,
-                                                            ),
+                                                            });
+                                                          },
+                                                          label: const Text(
+                                                              'Save'),
+                                                          icon: const Icon(
+                                                            Icons.save,
+                                                            color: Colors.green,
                                                           ),
-                                                          TextButton.icon(
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                questions.removeAt(
-                                                                    questionIndex);
+                                                        )
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              icon: const Icon(Icons.edit)),
+                                          title: Text(
+                                            'Q ${questionIndex + 1}: ${questions[questionIndex].body?.content ?? ''}',
+                                            softWrap: true,
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          trailing: IconButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog.adaptive(
+                                                      title: const Text(
+                                                          'Delete this Question'),
+                                                      actions: [
+                                                        TextButton.icon(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          label: const Text(
+                                                              'Cancel'),
+                                                          icon: const Icon(
+                                                            Icons.cancel,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                        TextButton.icon(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              questions.removeAt(
+                                                                  questionIndex);
 
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                              });
-                                                            },
-                                                            label: const Text(
-                                                                'Delete'),
-                                                            icon: const Icon(
-                                                              Icons
-                                                                  .delete_forever,
-                                                              color: Colors.red,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                icon: const Icon(Icons
-                                                    .delete_forever_rounded)),
-                                          ],
-                                        ),
-                                        title: Text(
-                                          'Q ${questionIndex + 1}: ${questions[questionIndex].body?.content ?? ''}',
-                                          softWrap: true,
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            });
+                                                          },
+                                                          label: const Text(
+                                                              'Delete'),
+                                                          icon: const Icon(
+                                                            Icons
+                                                                .delete_forever,
+                                                            color: Colors.red,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              icon: const Icon(Icons
+                                                  .delete_forever_rounded)),
                                         ),
                                         subtitle: ListView.builder(
                                           key: UniqueKey(),
@@ -529,8 +540,22 @@ class _HomepageState extends State<Homepage> {
                                                     ? Colors.green
                                                     : Colors.red[100],
                                               ),
-                                              title: Text(
-                                                  answer.body?.content ?? ''),
+                                              title: ListTile(
+                                                leading: IconButton(
+                                                    onPressed: () {},
+                                                    icon: const Icon(
+                                                      Icons.edit_note,
+                                                    )),
+                                                title: Text(
+                                                    answer.body?.content ?? ''),
+                                                trailing: IconButton(
+                                                  onPressed: () {},
+                                                  icon: const Icon(
+                                                    Icons.remove_circle_outline,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
                                             );
                                           },
                                           itemCount: questions[questionIndex]
@@ -765,6 +790,55 @@ class _HomepageState extends State<Homepage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadPreference();
+  }
+
+  _loadPreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isJSON = prefs.getBool('isJson') ?? true;
+    });
+  }
+
+  _savePreference(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isJson', value);
+  }
+
+  void _sortByName() {
+    setState(() {
+      if (isAscendingOrder) {
+        questions.sort((a, b) {
+          if (a.body?.content == null && b.body?.content == null) {
+            return 0;
+          } else if (a.body?.content == null) {
+            return 1;
+          } else if (b.body?.content == null) {
+            return -1;
+          } else {
+            return a.body!.content!.compareTo(b.body!.content!);
+          }
+        });
+      } else {
+        questions.sort((a, b) {
+          if (a.body?.content == null && b.body?.content == null) {
+            return 0;
+          } else if (a.body?.content == null) {
+            return -1;
+          } else if (b.body?.content == null) {
+            return 1;
+          } else {
+            return b.body!.content!.compareTo(a.body!.content!);
+          }
+        });
+      }
+      isAscendingOrder = !isAscendingOrder;
+    });
+  }
+
+  @override
   void dispose() {
     scrollController.dispose();
     super.dispose();
@@ -778,19 +852,20 @@ class _HomepageState extends State<Homepage> {
     if (isJSON) {
       input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
       final l = json.decode(input);
-      questions.insertAll(
-        0,
-        List<Question>.from(
-          l.map(
+
+      //
+      List<Question> tempList =  l.map(
             (model) {
-              Question q = Question.fromJson(model);
-              q.topicId = topicID;
-              q.subjectId = subjectID;
-              return q;
-            },
-          ),
-        ),
-      );
+          Question q = Question.fromJson(model);
+          q.topicId = topicID;
+          q.subjectId = subjectID;
+
+          return q;
+        },
+
+    ).toList();
+
+     ///////
     } else {
       List<List<dynamic>> rows =
           const CsvToListConverter().convert(input, fieldDelimiter: ',,,');

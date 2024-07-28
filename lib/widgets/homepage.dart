@@ -847,18 +847,20 @@ class _HomepageState extends State<Homepage> {
   void addQuestions() {
     topicID = topicController.text.trim();
     subjectID = subjectController.text.trim();
+    int addedQuestionCount = 0;
 
     String input = jsonInputController.text.trim();
     if (isJSON) {
       input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
       final l = json.decode(input);
 
+      List<Question> temp = [];
 
-      questions.insertAll(
+      temp.insertAll(
         0,
         List<Question>.from(
           l.map(
-                (model) {
+            (model) {
               Question q = Question.fromJson(model);
               q.topicId = topicID;
               q.subjectId = subjectID;
@@ -867,6 +869,11 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
       );
+      int questionsCount = questions.length;
+      copyQuestions(temp, questions);
+      addedQuestionCount = questions.length - questionsCount;
+
+
     } else {
       List<List<dynamic>> rows =
           const CsvToListConverter().convert(input, fieldDelimiter: ',,,');
@@ -908,12 +915,12 @@ class _HomepageState extends State<Homepage> {
             curve: Curves.easeIn,
             reverseCurve: Curves.bounceIn,
             reverseDuration: const Duration(seconds: 1)),
-        const SnackBar(
-          duration: Duration(seconds: 2),
-          content: Text('Questions added successfully'),
+         SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text('$addedQuestionCount new questions added successfully'),
           width: 600,
           backgroundColor: Colors.green,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           behavior: SnackBarBehavior.floating,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           dismissDirection: DismissDirection.horizontal,
@@ -940,6 +947,28 @@ class Boxed extends StatelessWidget {
       child: child,
     );
   }
+}
+
+void copyQuestions(List<Question> temp, List<Question> mainList) {
+
+  temp.forEach(
+    (quest) {
+      if (mainList.isEmpty) {
+        mainList.add(quest);
+      } else {
+        bool exist = false;
+        for (Question q in mainList) {
+          if (q.body?.content == quest.body?.content) {
+            exist = true;
+            break;
+          }
+        }
+        if (!exist) {
+          mainList.add(quest);
+        }
+      }
+    },
+  );
 }
 
 bool validateAllFieldsAreFilled(List<String> items) {

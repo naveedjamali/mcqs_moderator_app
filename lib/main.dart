@@ -3,19 +3,19 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mcqs_moderator_app/widgets/homepage.dart';
-import 'package:window_manager/window_manager.dart';
+// i/mport 'package:window_manager/window_manager.dart';
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb) {
-
-    if(Platform.isWindows){
-      await windowManager.ensureInitialized();
-      WindowManager.instance.setMinimumSize(const Size(1200, 800));
-    }
-
-  }
+  // if (!kIsWeb) {
+  //
+  //   if(Platform.isWindows){
+  //     await windowManager.ensureInitialized();
+  //     WindowManager.instance.setMinimumSize(const Size(1200, 800));
+  //   }
+  //
+  // }
   runApp(const MyApp());
 }
 
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
         useMaterial3: true,
       ),
-      home: const Homepage(),
+      home: Homepage(),
     );
   }
 }

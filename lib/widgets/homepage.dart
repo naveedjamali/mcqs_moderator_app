@@ -8,7 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/json_file_io.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:url_launcher/url_launcher.dart';
 
 import '../models.dart';
@@ -802,15 +802,16 @@ class _HomepageState extends State<Homepage> {
   }
 
   _loadPreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      isJSON = prefs.getBool('isJson') ?? true;
+      isJSON = /*prefs.getBool('isJson') ??*/ true;
     });
+
   }
 
   _savePreference(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isJson', value);
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.setBool('isJson', value);
   }
 
   void _sortByName() {

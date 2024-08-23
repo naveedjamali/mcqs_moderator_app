@@ -2,15 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
+//import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/json_file_io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 
 import '../models.dart';
 
@@ -29,7 +28,7 @@ class _HomepageState extends State<Homepage> {
   FocusNode inputFocus = FocusNode();
   final scrollController = ScrollController(keepScrollOffset: true);
   final randColors = [Colors.red, Colors.blue, Colors.yellow, Colors.brown];
-  final JsonFileIo jsonFileIo = JsonFileIo();
+  // final JsonFileIo jsonFileIo = JsonFileIo();
 
   final topicController = TextEditingController(
     text: '',
@@ -721,72 +720,72 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
-                  if (!kIsWeb)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: 100,
-                        height: 40,
-                        child: MaterialButton(
-                          onPressed: () async {
-                            String? selectedDirectory =
-                                await FilePicker.platform.getDirectoryPath(
-                              dialogTitle: 'Choose a location to save the file',
-                            );
-                            if (selectedDirectory == null) {
-                              //user canceled the picker
-                              return;
-                            }
-
-                            // Create a file in the selected directory
-                            String filePath =
-                                '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
-                                    .toLowerCase();
-
-                            File file = File(filePath);
-
-                            await file.writeAsString(jsonEncode(questions));
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Examiter'),
-                                  icon: const Icon(
-                                    Icons.download_for_offline_sharp,
-                                    color: Colors.green,
-                                  ),
-                                  content: Column(
-                                    children: [
-                                      const Text('File saved successfully'),
-                                      TextButton(
-                                          onPressed: () {
-                                            Uri uri = Uri.file(filePath);
-                                            launchUrl(uri);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text(filePath)),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text('OK'))
-                                  ],
-                                );
-                              },
-                            );
-
-                            // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
-                          },
-                          color: Colors.green,
-                          child: const Text(
-                            'Save JSON',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
+                  // if (!kIsWeb)
+                  //   Padding(
+                  //     padding: const EdgeInsets.all(8.0),
+                  //     child: SizedBox(
+                  //       width: 100,
+                  //       height: 40,
+                  //       child: MaterialButton(
+                  //         onPressed: () async {
+                  //           String? selectedDirectory =
+                  //               await FilePicker.platform.getDirectoryPath(
+                  //             dialogTitle: 'Choose a location to save the file',
+                  //           );
+                  //           if (selectedDirectory == null) {
+                  //             //user canceled the picker
+                  //             return;
+                  //           }
+                  //
+                  //           // Create a file in the selected directory
+                  //           String filePath =
+                  //               '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
+                  //                   .toLowerCase();
+                  //
+                  //           File file = File(filePath);
+                  //
+                  //           await file.writeAsString(jsonEncode(questions));
+                  //           showDialog(
+                  //             context: context,
+                  //             builder: (context) {
+                  //               return AlertDialog(
+                  //                 title: const Text('Examiter'),
+                  //                 icon: const Icon(
+                  //                   Icons.download_for_offline_sharp,
+                  //                   color: Colors.green,
+                  //                 ),
+                  //                 content: Column(
+                  //                   children: [
+                  //                     const Text('File saved successfully'),
+                  //                     TextButton(
+                  //                         onPressed: () {
+                  //                           Uri uri = Uri.file(filePath);
+                  //                           launchUrl(uri);
+                  //                           Navigator.of(context).pop();
+                  //                         },
+                  //                         child: Text(filePath)),
+                  //                   ],
+                  //                 ),
+                  //                 actions: [
+                  //                   TextButton(
+                  //                       onPressed: () =>
+                  //                           Navigator.of(context).pop(),
+                  //                       child: const Text('OK'))
+                  //                 ],
+                  //               );
+                  //             },
+                  //           );
+                  //
+                  //           // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
+                  //         },
+                  //         color: Colors.green,
+                  //         child: const Text(
+                  //           'Save JSON',
+                  //           style: TextStyle(color: Colors.white),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
                 ],
               ),
             ],

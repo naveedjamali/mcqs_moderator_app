@@ -794,7 +794,7 @@ class _HomepageState extends State<Homepage> {
   _loadPreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      isJSON = prefs.getBool('isJson') ?? true;
+      isJSON = prefs.getBool('isJson') ?? false;
     });
   }
 
@@ -851,8 +851,6 @@ class _HomepageState extends State<Homepage> {
       input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
       final l = json.decode(input);
 
-
-
       temp.insertAll(
         0,
         List<Question>.from(
@@ -866,7 +864,6 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
       );
-
     } else {
       List<List<dynamic>> rows = const CsvToListConverter().convert(
         input,
@@ -876,18 +873,38 @@ class _HomepageState extends State<Homepage> {
         convertEmptyTo: '\n',
         allowInvalid: false,
       );
-     // const csvConverter = CsvToListConverter();
+      // const csvConverter = CsvToListConverter();
       //csvConverter;
       for (List<dynamic> row in rows) {
+        //Create question
         Question q = Question();
+
         Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
         q.body = qBody;
         q.answerOptions = [];
-        for (int i = 1; i < row.length - 1; i++) {
+
+        //
+
+        for (int i = 1; i < row.length; i++) {
+          // create answer option.
           AnswerOptions answer = AnswerOptions(
               body: Body(content: '${row[i]}', contentType: 'PLAIN'),
-              isCorrect: row[i] == row[row.length - 1]);
-          q.answerOptions?.add(answer);
+              // isCorrect: row[i] == row[row.length - 1]);
+              isCorrect: false);
+          // check if the answer is already added.
+
+          if (containsAnswer(q.answerOptions ?? [], answer.body!.content)) {
+            for (int i = 0; i < q.answerOptions!.length; i++) {
+              if (q.answerOptions?[i].body?.content == answer.body?.content) {
+                q.answerOptions?[i].isCorrect = true;
+                break;
+              }
+            }
+          } else {
+
+            q.answerOptions?.add(answer);
+          }
+          //q.answerOptions?.add(answer);
         }
         temp.add(q);
         q.subjectId = subjectID;
@@ -912,7 +929,6 @@ class _HomepageState extends State<Homepage> {
       print(json.encode(questions));
     }
     setState(() {
-
       // jsonInputController.text = "";
       ScaffoldMessenger.of(context).showSnackBar(
         snackBarAnimationStyle: AnimationStyle(
@@ -933,6 +949,20 @@ class _HomepageState extends State<Homepage> {
         ),
       );
     });
+  }
+
+  bool containsAnswer(
+      List<AnswerOptions> answerOptionsList, String? answerText) {
+    if (answerOptionsList.isEmpty) {
+      return false;
+    }
+
+    for (int i = 0; i < answerOptionsList.length; i++) {
+      if (answerOptionsList[i].body?.content == answerText) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

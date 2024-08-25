@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mcqs_moderator_app/json_file_io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,13 +20,14 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  bool isJSON = true;
+  bool isJSON = false;
   bool isAscendingOrder = true;
   FocusNode topicFocus = FocusNode();
   FocusNode subjectFocus = FocusNode();
   FocusNode inputFocus = FocusNode();
   final scrollController = ScrollController(keepScrollOffset: true);
   final randColors = [Colors.red, Colors.blue, Colors.yellow, Colors.brown];
+
   // final JsonFileIo jsonFileIo = JsonFileIo();
 
   final topicController = TextEditingController(
@@ -429,8 +429,7 @@ class _HomepageState extends State<Homepage> {
                                                     actions: [
                                                       TextButton.icon(
                                                         onPressed: () {
-                                                          Navigator.of(
-                                                                  context)
+                                                          Navigator.of(context)
                                                               .pop();
                                                         },
                                                         label: const Text(
@@ -446,15 +445,14 @@ class _HomepageState extends State<Homepage> {
                                                             questions[questionIndex]
                                                                     .body
                                                                     ?.content =
-                                                                controller
-                                                                    .text;
+                                                                controller.text;
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
                                                           });
                                                         },
-                                                        label: const Text(
-                                                            'Save'),
+                                                        label:
+                                                            const Text('Save'),
                                                         icon: const Icon(
                                                           Icons.save,
                                                           color: Colors.green,
@@ -484,8 +482,7 @@ class _HomepageState extends State<Homepage> {
                                                     actions: [
                                                       TextButton.icon(
                                                         onPressed: () {
-                                                          Navigator.of(
-                                                                  context)
+                                                          Navigator.of(context)
                                                               .pop();
                                                         },
                                                         label: const Text(
@@ -509,8 +506,7 @@ class _HomepageState extends State<Homepage> {
                                                         label: const Text(
                                                             'Delete'),
                                                         icon: const Icon(
-                                                          Icons
-                                                              .delete_forever,
+                                                          Icons.delete_forever,
                                                           color: Colors.red,
                                                         ),
                                                       )
@@ -519,18 +515,17 @@ class _HomepageState extends State<Homepage> {
                                                 },
                                               );
                                             },
-                                            icon: const Icon(Icons
-                                                .delete_forever_rounded)),
+                                            icon: const Icon(
+                                                Icons.delete_forever_rounded)),
                                       ),
                                       subtitle: ListView.builder(
                                         key: UniqueKey(),
                                         shrinkWrap: true,
-                                        physics:
-                                            const ClampingScrollPhysics(),
+                                        physics: const ClampingScrollPhysics(),
                                         itemBuilder: (context, answerIndex) {
-                                          AnswerOptions answer = questions[
-                                                  questionIndex]
-                                              .answerOptions![answerIndex];
+                                          AnswerOptions answer =
+                                              questions[questionIndex]
+                                                  .answerOptions![answerIndex];
                                           final isCorrect =
                                               answer.isCorrect ?? false;
                                           return ListTile(
@@ -571,7 +566,6 @@ class _HomepageState extends State<Homepage> {
                             ),
                           ],
                         ),
-
                       ),
                     ),
                   ],
@@ -802,7 +796,6 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       isJSON = prefs.getBool('isJson') ?? true;
     });
-
   }
 
   _savePreference(bool value) async {
@@ -876,8 +869,16 @@ class _HomepageState extends State<Homepage> {
       copyQuestions(temp, questions);
       addedQuestionCount = questions.length - questionsCount;
     } else {
-      List<List<dynamic>> rows =
-          const CsvToListConverter().convert(input, fieldDelimiter: ',,,');
+      List<List<dynamic>> rows = const CsvToListConverter().convert(
+        input,
+        fieldDelimiter: ',,,',
+        eol: '\n',
+        shouldParseNumbers: true,
+        convertEmptyTo: '\n',
+        allowInvalid: false,
+      );
+     // const csvConverter = CsvToListConverter();
+      //csvConverter;
       for (List<dynamic> row in rows) {
         Question q = Question();
         Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');

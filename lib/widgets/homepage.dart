@@ -846,11 +846,12 @@ class _HomepageState extends State<Homepage> {
     int addedQuestionCount = 0;
 
     String input = jsonInputController.text.trim();
+    List<Question> temp = [];
     if (isJSON) {
       input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
       final l = json.decode(input);
 
-      List<Question> temp = [];
+
 
       temp.insertAll(
         0,
@@ -865,9 +866,7 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
       );
-      int questionsCount = questions.length;
-      copyQuestions(temp, questions);
-      addedQuestionCount = questions.length - questionsCount;
+
     } else {
       List<List<dynamic>> rows = const CsvToListConverter().convert(
         input,
@@ -890,13 +889,16 @@ class _HomepageState extends State<Homepage> {
               isCorrect: row[i] == row[row.length - 1]);
           q.answerOptions?.add(answer);
         }
-        questions.add(q);
+        temp.add(q);
         q.subjectId = subjectID;
         q.topicId = topicID;
         q.assignedPoints = 1;
         q.status = 'ACTIVE';
       }
     }
+    int questionsCount = questions.length;
+    copyQuestions(temp, questions);
+    addedQuestionCount = questions.length - questionsCount;
 
     setState(() {
       questions.shuffle();
@@ -910,6 +912,7 @@ class _HomepageState extends State<Homepage> {
       print(json.encode(questions));
     }
     setState(() {
+
       // jsonInputController.text = "";
       ScaffoldMessenger.of(context).showSnackBar(
         snackBarAnimationStyle: AnimationStyle(

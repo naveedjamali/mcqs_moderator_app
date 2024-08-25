@@ -51,7 +51,7 @@ class _HomepageState extends State<Homepage> {
       Flexible(
         flex: 2,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,261 +144,254 @@ class _HomepageState extends State<Homepage> {
       ),
       Flexible(
         flex: 3,
-        child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const Text(
-                      "OUTPUT",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 30,
-                    ),
-                    Text(
-                      'Total questions: ${questions.length}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 16,
-                    ),
-                    IconButton(
-                        onPressed: _sortByName,
-                        icon: const Icon(Icons.sort_by_alpha)),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          questions.shuffle();
-                        });
-                      },
-                      child: const Text('Shuffle Questions'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          for (var q in questions) {
-                            q.answerOptions?.shuffle();
-                          }
-                        });
-                      },
-                      child: const Text('Shuffle Answers'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog.adaptive(
-                                icon: const Icon(
-                                  Icons.warning,
-                                  color: Colors.red,
-                                ),
-                                content: Text(
-                                    'Do you want to remove all the ${questions.length} questions from the list?'),
-                                title: const Text('Warning'),
-                                actions: [
-                                  FilledButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: const Text('No')),
-                                  FilledButton(
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            WidgetStateColor.resolveWith(
-                                          (states) {
-                                            return Colors.white;
-                                          },
-                                        ),
-                                        backgroundColor:
-                                            WidgetStateColor.resolveWith(
-                                          (states) {
-                                            return Colors.red;
-                                          },
-                                        ),
-                                      ),
-                                      onPressed: () => setState(() {
-                                            questions.clear();
-                                            Navigator.of(context).pop();
-                                          }),
-                                      child: const Text(
-                                        'Yes',
-                                      ))
-                                ],
-                              );
-                            },
-                          );
-                        });
-                      },
-                      child: const Text('Clear Questions'),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(
-                color: Colors.black,
-                height: 0,
-                thickness: 1,
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  //child: Text('Nothing to show'),
-                  child: ListView.builder(
-                    controller: scrollController,
-                    key: UniqueKey(),
-                    itemBuilder: (context, questionIndex) {
-                      return ListTile(
-                        title: ListTile(
-                          leading: IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    TextEditingController controller =
-                                        TextEditingController();
-                                    controller.text = questions[questionIndex]
-                                            .body
-                                            ?.content ??
-                                        '';
-                                    return AlertDialog.adaptive(
-                                      title: const Text('Edit Question'),
-                                      content: TextField(
-                                        controller: controller,
-                                      ),
-                                      actions: [
-                                        TextButton.icon(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          label: const Text('Cancel'),
-                                          icon: const Icon(
-                                            Icons.cancel,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        TextButton.icon(
-                                          onPressed: () {
-                                            setState(() {
-                                              questions[questionIndex]
-                                                  .body
-                                                  ?.content = controller.text;
-                                              Navigator.of(context).pop();
-                                            });
-                                          },
-                                          label: const Text('Save'),
-                                          icon: const Icon(
-                                            Icons.save,
-                                            color: Colors.green,
-                                          ),
-                                        )
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              icon: const Icon(Icons.edit)),
-                          title: Text(
-                            'Q ${questionIndex + 1}: ${questions[questionIndex].body?.content ?? ''}',
-                            softWrap: true,
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          trailing: IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog.adaptive(
-                                      title: const Text('Delete this Question'),
-                                      actions: [
-                                        TextButton.icon(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          label: const Text('Cancel'),
-                                          icon: const Icon(
-                                            Icons.cancel,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        TextButton.icon(
-                                          onPressed: () {
-                                            setState(() {
-                                              questions.removeAt(questionIndex);
-
-                                              Navigator.of(context).pop();
-                                            });
-                                          },
-                                          label: const Text('Delete'),
-                                          icon: const Icon(
-                                            Icons.delete_forever,
-                                            color: Colors.red,
-                                          ),
-                                        )
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              icon: const Icon(Icons.delete_forever_rounded)),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        "OUTPUT",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
-                        subtitle: ListView.builder(
-                          key: UniqueKey(),
-                          shrinkWrap: true,
-                          physics: const ClampingScrollPhysics(),
-                          itemBuilder: (context, answerIndex) {
-                            AnswerOptions answer = questions[questionIndex]
-                                .answerOptions![answerIndex];
-                            final isCorrect = answer.isCorrect ?? false;
-                            return ListTile(
-                              leading: Container(
-                                width: 8,
-                                height: double.infinity,
-                                color:
-                                    isCorrect ? Colors.green : Colors.red[100],
-                              ),
-                              title: ListTile(
-                                leading: IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      Icons.edit_note,
-                                    )),
-                                title: Text(answer.body?.content ?? ''),
-                                trailing: IconButton(
-                                  onPressed: () {},
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      IconButton(
+                          onPressed: _sortByName,
+                          icon: const Icon(Icons.sort_by_alpha)),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            questions.shuffle();
+                          });
+                        },
+                        icon: const Icon(Icons.question_mark),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            for (var q in questions) {
+                              q.answerOptions?.shuffle();
+                            }
+                          });
+                        },
+                        icon: const Icon(Icons.question_answer),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog.adaptive(
                                   icon: const Icon(
-                                    Icons.remove_circle_outline,
+                                    Icons.warning,
                                     color: Colors.red,
                                   ),
-                                ),
-                              ),
+                                  content: Text(
+                                      'Do you want to remove all the ${questions.length} questions from the list?'),
+                                  title: const Text('Warning'),
+                                  actions: [
+                                    FilledButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text('No')),
+                                    FilledButton(
+                                        style: ButtonStyle(
+                                          foregroundColor:
+                                              WidgetStateColor.resolveWith(
+                                            (states) {
+                                              return Colors.white;
+                                            },
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateColor.resolveWith(
+                                            (states) {
+                                              return Colors.red;
+                                            },
+                                          ),
+                                        ),
+                                        onPressed: () => setState(() {
+                                              questions.clear();
+                                              Navigator.of(context).pop();
+                                            }),
+                                        child: const Text(
+                                          'Yes',
+                                        ))
+                                  ],
+                                );
+                              },
                             );
-                          },
-                          itemCount:
-                              questions[questionIndex].answerOptions?.length,
-                        ),
-                      );
-                    },
-                    itemCount: questions.length,
+                          });
+                        },
+                        icon: const Icon(Icons.clear),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                const Divider(
+                  color: Colors.black,
+                  height: 0,
+                  thickness: 1,
+                ),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    //child: Text('Nothing to show'),
+                    child: ListView.builder(
+                      controller: scrollController,
+                      key: UniqueKey(),
+                      itemBuilder: (context, questionIndex) {
+                        return ListTile(
+                          title: ListTile(
+                            leading: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      TextEditingController controller =
+                                          TextEditingController();
+                                      controller.text = questions[questionIndex]
+                                              .body
+                                              ?.content ??
+                                          '';
+                                      return AlertDialog.adaptive(
+                                        title: const Text('Edit Question'),
+                                        content: TextField(
+                                          controller: controller,
+                                        ),
+                                        actions: [
+                                          TextButton.icon(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            label: const Text('Cancel'),
+                                            icon: const Icon(
+                                              Icons.cancel,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                          TextButton.icon(
+                                            onPressed: () {
+                                              setState(() {
+                                                questions[questionIndex]
+                                                    .body
+                                                    ?.content = controller.text;
+                                                Navigator.of(context).pop();
+                                              });
+                                            },
+                                            label: const Text('Save'),
+                                            icon: const Icon(
+                                              Icons.save,
+                                              color: Colors.green,
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: const Icon(Icons.edit)),
+                            title: Text(
+                              'Q ${questionIndex + 1}: ${questions[questionIndex].body?.content ?? ''}',
+                              softWrap: true,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog.adaptive(
+                                        title: const Text('Delete this Question'),
+                                        actions: [
+                                          TextButton.icon(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            label: const Text('Cancel'),
+                                            icon: const Icon(
+                                              Icons.cancel,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          TextButton.icon(
+                                            onPressed: () {
+                                              setState(() {
+                                                questions.removeAt(questionIndex);
+
+                                                Navigator.of(context).pop();
+                                              });
+                                            },
+                                            label: const Text('Delete'),
+                                            icon: const Icon(
+                                              Icons.delete_forever,
+                                              color: Colors.red,
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: const Icon(Icons.delete_forever_rounded)),
+                          ),
+                          subtitle: ListView.builder(
+                            key: UniqueKey(),
+                            shrinkWrap: true,
+                            physics: const ClampingScrollPhysics(),
+                            itemBuilder: (context, answerIndex) {
+                              AnswerOptions answer = questions[questionIndex]
+                                  .answerOptions![answerIndex];
+                              final isCorrect = answer.isCorrect ?? false;
+                              return ListTile(
+                                leading: Container(
+                                  width: 8,
+                                  height: double.infinity,
+                                  color:
+                                      isCorrect ? Colors.green : Colors.red[100],
+                                ),
+                                title: ListTile(
+                                  leading: IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.edit_note,
+                                      )),
+                                  title: Text(answer.body?.content ?? ''),
+                                  trailing: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount:
+                                questions[questionIndex].answerOptions?.length,
+                          ),
+                        );
+                      },
+                      itemCount: questions.length,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -458,16 +451,13 @@ class _HomepageState extends State<Homepage> {
             children: [
               Flexible(
                 flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: portrait
-                      ? Column(
-                          children: widgets,
-                        )
-                      : Row(
-                          children: widgets,
-                        ),
-                ),
+                child: portrait
+                    ? Column(
+                        children: widgets,
+                      )
+                    : Row(
+                        children: widgets,
+                      ),
               ),
               Row(
                 children: [

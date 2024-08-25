@@ -316,7 +316,8 @@ class _HomepageState extends State<Homepage> {
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog.adaptive(
-                                        title: const Text('Delete this Question'),
+                                        title:
+                                            const Text('Delete this Question'),
                                         actions: [
                                           TextButton.icon(
                                             onPressed: () {
@@ -331,7 +332,8 @@ class _HomepageState extends State<Homepage> {
                                           TextButton.icon(
                                             onPressed: () {
                                               setState(() {
-                                                questions.removeAt(questionIndex);
+                                                questions
+                                                    .removeAt(questionIndex);
 
                                                 Navigator.of(context).pop();
                                               });
@@ -361,8 +363,9 @@ class _HomepageState extends State<Homepage> {
                                 leading: Container(
                                   width: 8,
                                   height: double.infinity,
-                                  color:
-                                      isCorrect ? Colors.green : Colors.red[100],
+                                  color: isCorrect
+                                      ? Colors.green
+                                      : Colors.red[100],
                                 ),
                                 title: ListTile(
                                   leading: IconButton(
@@ -427,7 +430,11 @@ class _HomepageState extends State<Homepage> {
                     return DropdownMenuItem<String>(
                       alignment: Alignment.bottomLeft,
                       value: value,
-                      child: Center(child: Text(value)),
+                      child: Center(
+                          child: Text(
+                        value,
+                        style: const TextStyle(color: Colors.blue),
+                      )),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -436,6 +443,24 @@ class _HomepageState extends State<Homepage> {
                     });
                     _savePreference(isJSON);
                   },
+                ),
+                if (!kIsWeb)Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 100,
+                    height: 40,
+                    child: MaterialButton(
+                      onPressed: () async {
+                        await Clipboard.setData(
+                            ClipboardData(text: jsonEncode(questions)));
+                      },
+                      color: Colors.green,
+                      child: const Text(
+                        'Copy JSON',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -482,6 +507,7 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
+                  const Spacer(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
@@ -529,8 +555,8 @@ class _HomepageState extends State<Homepage> {
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: const Text('Error'),
-                                content: const Text(
-                                    'Input JSON in the input box to add questions'),
+                                content: Text(
+                                    'Input ${isJSON?'JSON':'CSV'} in the input box to add questions'),
                                 actions: [
                                   MaterialButton(
                                       onPressed: () {
@@ -572,10 +598,10 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                   const Spacer(),
-                  Padding(
+                  if (kIsWeb)Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
-                      width: 120,
+                      width: 100,
                       height: 40,
                       child: MaterialButton(
                         onPressed: () async {
@@ -583,17 +609,9 @@ class _HomepageState extends State<Homepage> {
                               ClipboardData(text: jsonEncode(questions)));
                         },
                         color: Colors.green,
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.copy,
-                              color: Colors.white,
-                            ),
-                            Text(
-                              'Copy JSON',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
+                        child: const Text(
+                          'Copy JSON',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                     ),

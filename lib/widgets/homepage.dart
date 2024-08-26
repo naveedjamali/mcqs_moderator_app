@@ -290,6 +290,7 @@ class _HomepageState extends State<Homepage> {
                       const SizedBox(
                         width: 30,
                       ),
+                      Text('${questions.length} Questions'),
                       IconButton(
                           onPressed: _sortByName,
                           icon: const Icon(Icons.sort_by_alpha)),
@@ -529,7 +530,8 @@ class _HomepageState extends State<Homepage> {
               children: [
                 if(portrait)Column(
                   children: [
-                    Center(child: Image.asset("assets/images/icon.png", width: 150,),),
+                    Center(child: Image.asset("assets/images/icon.png", width: 80,),),
+                    const   SizedBox(height: 20,),
                     TextField(
                       focusNode: topicFocus,
                       controller: topicController,

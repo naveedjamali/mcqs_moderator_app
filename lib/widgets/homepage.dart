@@ -529,6 +529,7 @@ class _HomepageState extends State<Homepage> {
               children: [
                 if(portrait)Column(
                   children: [
+                    Center(child: Image.asset("assets/images/icon.png", width: 150,),),
                     TextField(
                       focusNode: topicFocus,
                       controller: topicController,

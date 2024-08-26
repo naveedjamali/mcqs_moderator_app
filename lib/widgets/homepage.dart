@@ -56,7 +56,7 @@ class _HomepageState extends State<Homepage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              if (!portrait)Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Flexible(
@@ -251,91 +251,7 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  if (kIsWeb)Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 100,
-                      height: 40,
-                      child: MaterialButton(
-                        onPressed: () async {
-                          await Clipboard.setData(
-                              ClipboardData(text: jsonEncode(questions)));
-                        },
-                        color: Colors.green,
-                        child: const Text(
-                          'Copy JSON',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (!kIsWeb)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: 100,
-                        height: 40,
-                        child: MaterialButton(
-                          onPressed: () async {
-                            String? selectedDirectory =
-                            await FilePicker.platform.getDirectoryPath(
-                              dialogTitle: 'Choose a location to save the file',
-                            );
-                            if (selectedDirectory == null) {
-                              //user canceled the picker
-                              return;
-                            }
 
-                            // Create a file in the selected directory
-                            String filePath =
-                            '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
-                                .toLowerCase();
-
-                            File file = File(filePath);
-
-                            await file.writeAsString(jsonEncode(questions));
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Examiter'),
-                                  icon: const Icon(
-                                    Icons.download_for_offline_sharp,
-                                    color: Colors.green,
-                                  ),
-                                  content: Column(
-                                    children: [
-                                      const Text('File saved successfully'),
-                                      TextButton(
-                                          onPressed: () {
-                                            Uri uri = Uri.file(filePath);
-                                            launchUrl(uri);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text(filePath)),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text('OK'))
-                                  ],
-                                );
-                              },
-                            );
-
-                            // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
-                          },
-                          color: Colors.green,
-                          child: const Text(
-                            'Save JSON',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ],
@@ -351,7 +267,7 @@ class _HomepageState extends State<Homepage> {
       Flexible(
         flex: 3,
         child: Padding(
-          padding: !portrait? const EdgeInsets.all(8.0):const EdgeInsets.only(bottom: 8,left: 8,right: 8),
+          padding: !portrait? const EdgeInsets.only(top: 8.0):const EdgeInsets.only(bottom: 8),
           child: SizedBox(
             width: double.infinity,
             // decoration: BoxDecoration(
@@ -360,89 +276,92 @@ class _HomepageState extends State<Homepage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    const Text(
-                      "OUTPUT",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        "OUTPUT",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 30,
-                    ),
-                    IconButton(
-                        onPressed: _sortByName,
-                        icon: const Icon(Icons.sort_by_alpha)),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          questions.shuffle();
-                        });
-                      },
-                      icon: const Icon(Icons.question_mark),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          for (var q in questions) {
-                            q.answerOptions?.shuffle();
-                          }
-                        });
-                      },
-                      icon: const Icon(Icons.question_answer),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog.adaptive(
-                                icon: const Icon(
-                                  Icons.warning,
-                                  color: Colors.red,
-                                ),
-                                content: Text(
-                                    'Do you want to remove all the ${questions.length} questions from the list?'),
-                                title: const Text('Warning'),
-                                actions: [
-                                  FilledButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: const Text('No')),
-                                  FilledButton(
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            WidgetStateColor.resolveWith(
-                                          (states) {
-                                            return Colors.white;
-                                          },
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      IconButton(
+                          onPressed: _sortByName,
+                          icon: const Icon(Icons.sort_by_alpha)),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            questions.shuffle();
+                          });
+                        },
+                        icon: const Icon(Icons.question_mark),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            for (var q in questions) {
+                              q.answerOptions?.shuffle();
+                            }
+                          });
+                        },
+                        icon: const Icon(Icons.question_answer),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog.adaptive(
+                                  icon: const Icon(
+                                    Icons.warning,
+                                    color: Colors.red,
+                                  ),
+                                  content: Text(
+                                      'Do you want to remove all the ${questions.length} questions from the list?'),
+                                  title: const Text('Warning'),
+                                  actions: [
+                                    FilledButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text('No')),
+                                    FilledButton(
+                                        style: ButtonStyle(
+                                          foregroundColor:
+                                              WidgetStateColor.resolveWith(
+                                            (states) {
+                                              return Colors.white;
+                                            },
+                                          ),
+                                          backgroundColor:
+                                              WidgetStateColor.resolveWith(
+                                            (states) {
+                                              return Colors.red;
+                                            },
+                                          ),
                                         ),
-                                        backgroundColor:
-                                            WidgetStateColor.resolveWith(
-                                          (states) {
-                                            return Colors.red;
-                                          },
-                                        ),
-                                      ),
-                                      onPressed: () => setState(() {
-                                            questions.clear();
-                                            Navigator.of(context).pop();
-                                          }),
-                                      child: const Text(
-                                        'Yes',
-                                      ))
-                                ],
-                              );
-                            },
-                          );
-                        });
-                      },
-                      icon: const Icon(Icons.clear),
-                    ),
-                  ],
+                                        onPressed: () => setState(() {
+                                              questions.clear();
+                                              Navigator.of(context).pop();
+                                            }),
+                                        child: const Text(
+                                          'Yes',
+                                        ))
+                                  ],
+                                );
+                              },
+                            );
+                          });
+                        },
+                        icon: const Icon(Icons.clear),
+                      ),
+                    ],
+                  ),
                 ),
                 const Divider(
                   color: Colors.black,
@@ -608,6 +527,52 @@ class _HomepageState extends State<Homepage> {
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
+                if(portrait)Column(
+                  children: [
+                    TextField(
+                      focusNode: topicFocus,
+                      controller: topicController,
+                      onChanged: (text) => {
+                        setState(() {
+                          topicID = topicController.text;
+                        })
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Topic ID",
+                        hintStyle: TextStyle(
+                            color: Colors.grey, fontWeight: FontWeight.w400),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(15),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    TextField(
+                      focusNode: subjectFocus,
+                      controller: subjectController,
+                      canRequestFocus: true,
+                      onChanged: (text) => {
+                        setState(() {
+                          subjectID = subjectController.text;
+                        }),
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Subject ID",
+                        hintStyle: TextStyle(
+                            color: Colors.grey, fontWeight: FontWeight.w400),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(15),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(
                   height: 16,
                 ),
@@ -674,6 +639,90 @@ class _HomepageState extends State<Homepage> {
               "Examiter MCQs Moderator",
               style: TextStyle(color: Colors.white),
             ),
+            actions: [ Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: 100,
+                height: 40,
+                child: MaterialButton(
+                  onPressed: () async {
+                    await Clipboard.setData(
+                        ClipboardData(text: jsonEncode(questions)));
+                  },
+                  color: Colors.green,
+                  child: const Text(
+                    'Copy JSON',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+              if (!kIsWeb)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 100,
+                    height: 40,
+                    child: MaterialButton(
+                      onPressed: () async {
+                        String? selectedDirectory =
+                        await FilePicker.platform.getDirectoryPath(
+                          dialogTitle: 'Choose a location to save the file',
+                        );
+                        if (selectedDirectory == null) {
+                          //user canceled the picker
+                          return;
+                        }
+
+                        // Create a file in the selected directory
+                        String filePath =
+                        '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
+                            .toLowerCase();
+
+                        File file = File(filePath);
+
+                        await file.writeAsString(jsonEncode(questions));
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Examiter'),
+                              icon: const Icon(
+                                Icons.download_for_offline_sharp,
+                                color: Colors.green,
+                              ),
+                              content: Column(
+                                children: [
+                                  const Text('File saved successfully'),
+                                  TextButton(
+                                      onPressed: () {
+                                        Uri uri = Uri.file(filePath);
+                                        launchUrl(uri);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(filePath)),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text('OK'))
+                              ],
+                            );
+                          },
+                        );
+
+                        // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
+                      },
+                      color: Colors.green,
+                      child: const Text(
+                        'Save JSON',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),],
           ),
           body: Column(
             children: [
@@ -892,8 +941,7 @@ class Boxed extends StatelessWidget {
 }
 
 void copyQuestions(List<Question> temp, List<Question> mainList) {
-  temp.forEach(
-    (quest) {
+  for (var quest in temp) {
       if (mainList.isEmpty) {
         mainList.add(quest);
       } else {
@@ -908,8 +956,7 @@ void copyQuestions(List<Question> temp, List<Question> mainList) {
           mainList.add(quest);
         }
       }
-    },
-  );
+    }
 }
 
 bool validateAllFieldsAreFilled(List<String> items) {

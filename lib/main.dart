@@ -30,10 +30,10 @@ class MyApp extends StatelessWidget {
       title: 'Examiter MCQs Moderator',
       theme: ThemeData(
 
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: Homepage(),
+      home: const Homepage(),
     );
   }
 }

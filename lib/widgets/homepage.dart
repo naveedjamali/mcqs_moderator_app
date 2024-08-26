@@ -51,64 +51,67 @@ class _HomepageState extends State<Homepage> {
       Flexible(
         flex: 2,
         child: Padding(
-          padding: !portrait? const EdgeInsets.all(8.0):const EdgeInsets.only(top: 8,left: 8,right: 8),
+          padding: !portrait
+              ? const EdgeInsets.all(8.0)
+              : const EdgeInsets.only(top: 8, left: 8, right: 8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!portrait)Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(
-                    flex: 1,
-                    child: TextField(
-                      focusNode: topicFocus,
-                      controller: topicController,
-                      onChanged: (text) => {
-                        setState(() {
-                          topicID = topicController.text;
-                        })
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "Topic ID",
-                        hintStyle: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w400),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
+              if (!portrait)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      child: TextField(
+                        focusNode: topicFocus,
+                        controller: topicController,
+                        onChanged: (text) => {
+                          setState(() {
+                            topicID = topicController.text;
+                          })
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "Topic ID",
+                          hintStyle: TextStyle(
+                              color: Colors.grey, fontWeight: FontWeight.w400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Flexible(
-                    flex: 1,
-                    child: TextField(
-                      focusNode: subjectFocus,
-                      controller: subjectController,
-                      canRequestFocus: true,
-                      onChanged: (text) => {
-                        setState(() {
-                          subjectID = subjectController.text;
-                        }),
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "Subject ID",
-                        hintStyle: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w400),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: TextField(
+                        focusNode: subjectFocus,
+                        controller: subjectController,
+                        canRequestFocus: true,
+                        onChanged: (text) => {
+                          setState(() {
+                            subjectID = subjectController.text;
+                          }),
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "Subject ID",
+                          hintStyle: TextStyle(
+                              color: Colors.grey, fontWeight: FontWeight.w400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
               const SizedBox(
                 height: 10,
               ),
@@ -161,7 +164,6 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
@@ -210,7 +212,7 @@ class _HomepageState extends State<Homepage> {
                               builder: (context) => AlertDialog(
                                 title: const Text('Error'),
                                 content: Text(
-                                    'Input ${isJSON?'JSON':'CSV'} in the input box to add questions'),
+                                    'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
                                 actions: [
                                   MaterialButton(
                                       onPressed: () {
@@ -251,23 +253,30 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ],
           ),
         ),
       ),
-      if(portrait)const Divider(
-        color: Colors.black,
-        height: 0,
-        thickness: 1,
-      ),
-      if(!portrait)const VerticalDivider(width: 0,color: Colors.black, thickness: 1,),
+      if (portrait)
+        const Divider(
+          color: Colors.black,
+          height: 0,
+          thickness: 1,
+        ),
+      if (!portrait)
+        const VerticalDivider(
+          width: 0,
+          color: Colors.black,
+          thickness: 1,
+        ),
       Flexible(
         flex: 3,
         child: Padding(
-          padding: !portrait? const EdgeInsets.only(top: 8.0):const EdgeInsets.only(bottom: 8),
+          padding: !portrait
+              ? const EdgeInsets.only(top: 8.0)
+              : const EdgeInsets.only(bottom: 8),
           child: SizedBox(
             width: double.infinity,
             // decoration: BoxDecoration(
@@ -290,7 +299,14 @@ class _HomepageState extends State<Homepage> {
                       const SizedBox(
                         width: 30,
                       ),
-                      Text('${questions.length} Questions'),
+                      Text(
+                        '${questions.length} Questions',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const SizedBox(
+                        width: 16,
+                      ),
                       IconButton(
                           onPressed: _sortByName,
                           icon: const Icon(Icons.sort_by_alpha)),
@@ -361,6 +377,115 @@ class _HomepageState extends State<Homepage> {
                         },
                         icon: const Icon(Icons.clear),
                       ),
+                      const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 120,
+                          height: 40,
+                          child: MaterialButton(
+                            // icon: const Icon(Icons.copy, color: Colors.green,),
+                            onPressed: () async {
+                              await Clipboard.setData(
+                                  ClipboardData(text: jsonEncode(questions)));
+                            },
+                            color: Colors.green,
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.copy,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  'Copy JSON',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (!kIsWeb)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            width: 120,
+                            height: 40,
+                            child: MaterialButton(
+                              onPressed: () async {
+                                String? selectedDirectory =
+                                    await FilePicker.platform.getDirectoryPath(
+                                  dialogTitle:
+                                      'Choose a location to save the file',
+                                );
+                                if (selectedDirectory == null) {
+                                  //user canceled the picker
+                                  return;
+                                }
+
+                                // Create a file in the selected directory
+                                String filePath =
+                                    '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
+                                        .toLowerCase();
+
+                                File file = File(filePath);
+
+                                await file.writeAsString(jsonEncode(questions));
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Examiter'),
+                                      icon: const Icon(
+                                        Icons.download_for_offline_sharp,
+                                        color: Colors.green,
+                                      ),
+                                      content: Column(
+                                        children: [
+                                          const Text('File saved successfully'),
+                                          TextButton(
+                                              onPressed: () {
+                                                Uri uri = Uri.file(filePath);
+                                                launchUrl(uri);
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text(filePath)),
+                                        ],
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Text('OK'))
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
+                              },
+                              color: Colors.green,
+                              child: const Row(
+                                children: [
+                                  Icon(
+                                    Icons.save,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    'Save JSON',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -528,54 +653,62 @@ class _HomepageState extends State<Homepage> {
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                if(portrait)Column(
-                  children: [
-                    Center(child: Image.asset("assets/images/icon.png", width: 80,),),
-                    const   SizedBox(height: 20,),
-                    TextField(
-                      focusNode: topicFocus,
-                      controller: topicController,
-                      onChanged: (text) => {
-                        setState(() {
-                          topicID = topicController.text;
-                        })
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "Topic ID",
-                        hintStyle: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w400),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    TextField(
-                      focusNode: subjectFocus,
-                      controller: subjectController,
-                      canRequestFocus: true,
-                      onChanged: (text) => {
-                        setState(() {
-                          subjectID = subjectController.text;
-                        }),
-                      },
-                      decoration: const InputDecoration(
-                        hintText: "Subject ID",
-                        hintStyle: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w400),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(15),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                Center(
+                  child: Image.asset(
+                    "assets/images/icon.png",
+                    width: 80,
+                  ),
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
+                if (portrait)
+                  Column(
+                    children: [
+                      TextField(
+                        focusNode: topicFocus,
+                        controller: topicController,
+                        onChanged: (text) => {
+                          setState(() {
+                            topicID = topicController.text;
+                          })
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "Topic ID",
+                          hintStyle: TextStyle(
+                              color: Colors.grey, fontWeight: FontWeight.w400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      TextField(
+                        focusNode: subjectFocus,
+                        controller: subjectController,
+                        canRequestFocus: true,
+                        onChanged: (text) => {
+                          setState(() {
+                            subjectID = subjectController.text;
+                          }),
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "Subject ID",
+                          hintStyle: TextStyle(
+                              color: Colors.grey, fontWeight: FontWeight.w400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 const SizedBox(
                   height: 16,
                 ),
@@ -604,7 +737,7 @@ class _HomepageState extends State<Homepage> {
                       child: Center(
                           child: Text(
                         value,
-                        style: const TextStyle(color: Colors.blue),
+                        style: const TextStyle(color: Colors.green),
                       )),
                     );
                   }).toList(),
@@ -615,117 +748,16 @@ class _HomepageState extends State<Homepage> {
                     _savePreference(isJSON);
                   },
                 ),
-                if (!kIsWeb)Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 100,
-                    height: 40,
-                    child: MaterialButton(
-                      onPressed: () async {
-                        await Clipboard.setData(
-                            ClipboardData(text: jsonEncode(questions)));
-                      },
-                      color: Colors.green,
-                      child: const Text(
-                        'Copy JSON',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
           appBar: AppBar(
-            backgroundColor: Colors.purple,
+            backgroundColor: Colors.green,
             title: const Text(
               "Examiter MCQs Moderator",
               style: TextStyle(color: Colors.white),
             ),
-            actions: [ Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                width: 100,
-                height: 40,
-                child: MaterialButton(
-                  onPressed: () async {
-                    await Clipboard.setData(
-                        ClipboardData(text: jsonEncode(questions)));
-                  },
-                  color: Colors.green,
-                  child: const Text(
-                    'Copy JSON',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-              if (!kIsWeb)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 100,
-                    height: 40,
-                    child: MaterialButton(
-                      onPressed: () async {
-                        String? selectedDirectory =
-                        await FilePicker.platform.getDirectoryPath(
-                          dialogTitle: 'Choose a location to save the file',
-                        );
-                        if (selectedDirectory == null) {
-                          //user canceled the picker
-                          return;
-                        }
-
-                        // Create a file in the selected directory
-                        String filePath =
-                        '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
-                            .toLowerCase();
-
-                        File file = File(filePath);
-
-                        await file.writeAsString(jsonEncode(questions));
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Examiter'),
-                              icon: const Icon(
-                                Icons.download_for_offline_sharp,
-                                color: Colors.green,
-                              ),
-                              content: Column(
-                                children: [
-                                  const Text('File saved successfully'),
-                                  TextButton(
-                                      onPressed: () {
-                                        Uri uri = Uri.file(filePath);
-                                        launchUrl(uri);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text(filePath)),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    child: const Text('OK'))
-                              ],
-                            );
-                          },
-                        );
-
-                        // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
-                      },
-                      color: Colors.green,
-                      child: const Text(
-                        'Save JSON',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),],
+            actions: const [],
           ),
           body: Column(
             children: [
@@ -739,7 +771,6 @@ class _HomepageState extends State<Homepage> {
                         children: widgets,
                       ),
               ),
-
             ],
           )),
     );
@@ -825,6 +856,7 @@ class _HomepageState extends State<Homepage> {
         ),
       );
     } else {
+      input.replaceAll('\n', '');
       List<List<dynamic>> rows = const CsvToListConverter().convert(
         input,
         fieldDelimiter: ',,,',
@@ -847,8 +879,10 @@ class _HomepageState extends State<Homepage> {
 
         for (int i = 1; i < row.length; i++) {
           // create answer option.
+
           AnswerOptions answer = AnswerOptions(
-              body: Body(content: '${row[i]}', contentType: 'PLAIN'),
+              body:
+                  Body(content: row[i].toString().trim(), contentType: 'PLAIN'),
               // isCorrect: row[i] == row[row.length - 1]);
               isCorrect: false);
           // check if the answer is already added.
@@ -865,11 +899,25 @@ class _HomepageState extends State<Homepage> {
           }
           //q.answerOptions?.add(answer);
         }
-        temp.add(q);
+
+        //check that at least one answer is correct in the question.
+        bool containCorrectAnswer = false;
+        q.answerOptions?.forEach(
+          (element) {
+            if (element.isCorrect ?? false) {
+              containCorrectAnswer = true;
+            }
+          },
+        );
+        if (!containCorrectAnswer) {
+          continue;
+        }
+
         q.subjectId = subjectID;
         q.topicId = topicID;
         q.assignedPoints = 1;
         q.status = 'ACTIVE';
+        temp.add(q);
       }
     }
     int questionsCount = questions.length;
@@ -945,21 +993,21 @@ class Boxed extends StatelessWidget {
 
 void copyQuestions(List<Question> temp, List<Question> mainList) {
   for (var quest in temp) {
-      if (mainList.isEmpty) {
-        mainList.add(quest);
-      } else {
-        bool exist = false;
-        for (Question q in mainList) {
-          if (q.body?.content == quest.body?.content) {
-            exist = true;
-            break;
-          }
-        }
-        if (!exist) {
-          mainList.add(quest);
+    if (mainList.isEmpty) {
+      mainList.add(quest);
+    } else {
+      bool exist = false;
+      for (Question q in mainList) {
+        if (q.body?.content == quest.body?.content) {
+          exist = true;
+          break;
         }
       }
+      if (!exist) {
+        mainList.add(quest);
+      }
     }
+  }
 }
 
 bool validateAllFieldsAreFilled(List<String> items) {

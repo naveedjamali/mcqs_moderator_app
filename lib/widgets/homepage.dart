@@ -253,6 +253,111 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      width: 170,
+                      height: 40,
+                      child: MaterialButton(
+                        color: Colors.green,
+                        onPressed: () async {
+                          final clipBoardData =
+                              await Clipboard.getData(Clipboard.kTextPlain);
+                          jsonInputController.text =
+                              clipBoardData!.text.toString() ?? "";
+
+                          if (topicID.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Error'),
+                                content: const Text(
+                                    'Enter Topic ID in the topic field'),
+                                actions: [
+                                  MaterialButton(
+                                      onPressed: () {
+                                        topicFocus.requestFocus();
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              ),
+                            );
+                          } else if (subjectID.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Error'),
+                                content: const Text(
+                                    'Enter Subject ID in the subject field'),
+                                actions: [
+                                  MaterialButton(
+                                      onPressed: () {
+                                        subjectFocus.requestFocus();
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              ),
+                            );
+                          } else if (jsonInputController.text.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Error'),
+                                content: Text(
+                                    'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
+                                actions: [
+                                  MaterialButton(
+                                      onPressed: () {
+                                        inputFocus.requestFocus();
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK'))
+                                ],
+                              ),
+                            );
+                          } else {
+                            try {
+                              addQuestions();
+                            } catch (e) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Error'),
+                                  content: Text(
+                                      'Entered JSON is not in correct format. looks like some keys or values are missing or invalid.\n${e.toString()}'),
+                                  actions: [
+                                    MaterialButton(
+                                        onPressed: () {
+                                          inputFocus.requestFocus();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.settings_applications_outlined,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Reset | Paste | Add",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

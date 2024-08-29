@@ -973,14 +973,17 @@ class _HomepageState extends State<Homepage> {
       // const csvConverter = CsvToListConverter();
       //csvConverter;
       for (List<dynamic> row in rows) {
+
+        if(row.length<3){
+          // Invalid question
+          continue;
+        }
         //Create question
         Question q = Question();
 
         Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
         q.body = qBody;
         q.answerOptions = [];
-
-        //
 
         for (int i = 1; i < row.length; i++) {
           // create answer option.
@@ -1002,7 +1005,6 @@ class _HomepageState extends State<Homepage> {
           } else {
             q.answerOptions?.add(answer);
           }
-          //q.answerOptions?.add(answer);
         }
 
         //check that at least one answer is correct in the question.

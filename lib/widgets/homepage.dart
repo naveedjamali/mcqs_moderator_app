@@ -20,6 +20,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  bool useAi = true;
   bool isJSON = false;
   bool isAscendingOrder = true;
   FocusNode topicFocus = FocusNode();
@@ -823,6 +824,22 @@ class _HomepageState extends State<Homepage> {
                   ),
                 const SizedBox(
                   height: 16,
+                ),
+                SizedBox(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Use AI'),
+                      Switch(
+                        value: useAi,
+                        onChanged: (value) {
+                          setState(() {
+                            useAi = value;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 const Text(
                   'Current Input Format: ',

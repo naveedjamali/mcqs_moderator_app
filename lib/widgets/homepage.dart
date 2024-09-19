@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mcqs_moderator_app/widgets/ai_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,6 +21,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  String systemInstructions = "";
   bool useAi = true;
   bool isJSON = false;
   bool isAscendingOrder = true;
@@ -119,124 +121,117 @@ class _HomepageState extends State<Homepage> {
               const SizedBox(
                 height: 10,
               ),
-              Flexible(
-                child: Boxed(
-                  child: TextField(
-                    style: const TextStyle(fontFamily: "Courier"),
-                    focusNode: inputFocus,
-                    decoration: InputDecoration(
-                        border: null,
-                        hintText:
-                            "write or paste your ${isJSON ? 'JSON' : 'CSV'} here...",
-                        hintStyle: const TextStyle(
-                            fontWeight: FontWeight.w300, color: Colors.grey)),
-                    controller: jsonInputController,
-                    autocorrect: false,
-                    canRequestFocus: true,
-                    dragStartBehavior: DragStartBehavior.start,
-                    expands: true,
-                    minLines: null,
-                    maxLines: null,
-                    onChanged: (text) {
-                      setState(() {
-                        inputText = jsonInputController.text;
-                      });
-                    },
+              if (useAi)
+                Flexible(
+                  child: Boxed(
+                    child: AiWidget(
+                      subject: subjectID,
+                      topic: topicID,
+                      addQuestions: addQuestions,
+                      setCSV: setCSV,
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 100,
-                      height: 40,
-                      child: MaterialButton(
-                        color: Colors.red,
-                        onPressed: () {
-                          setState(() {
-                            jsonInputController.text = "";
-                            inputText = "";
-                            inputFocus.requestFocus();
-                          });
-                        },
-                        child: const Text(
-                          "Reset Input",
-                          style: TextStyle(color: Colors.white),
+              if (!useAi)
+                Flexible(
+                  child: Boxed(
+                    child: TextField(
+                      style: const TextStyle(fontFamily: "Courier"),
+                      focusNode: inputFocus,
+                      decoration: InputDecoration(
+                          border: null,
+                          hintText:
+                              "write or paste your ${isJSON ? 'JSON' : 'CSV'} here...",
+                          hintStyle: const TextStyle(
+                              fontWeight: FontWeight.w300, color: Colors.grey)),
+                      controller: jsonInputController,
+                      autocorrect: false,
+                      canRequestFocus: true,
+                      dragStartBehavior: DragStartBehavior.start,
+                      expands: true,
+                      minLines: null,
+                      maxLines: null,
+                      onChanged: (text) {
+                        setState(() {
+                          inputText = jsonInputController.text;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              if (!useAi)
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 100,
+                        height: 40,
+                        child: MaterialButton(
+                          color: Colors.red,
+                          onPressed: () {
+                            setState(() {
+                              jsonInputController.text = "";
+                              inputText = "";
+                              inputFocus.requestFocus();
+                            });
+                          },
+                          child: const Text(
+                            "Reset Input",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 100,
-                      height: 40,
-                      child: MaterialButton(
-                        color: Colors.green,
-                        onPressed: () {
-                          if (topicID.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text(
-                                    'Enter Topic ID in the topic field'),
-                                actions: [
-                                  MaterialButton(
-                                      onPressed: () {
-                                        topicFocus.requestFocus();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              ),
-                            );
-                          } else if (subjectID.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text(
-                                    'Enter Subject ID in the subject field'),
-                                actions: [
-                                  MaterialButton(
-                                      onPressed: () {
-                                        subjectFocus.requestFocus();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              ),
-                            );
-                          } else if (jsonInputController.text.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error'),
-                                content: Text(
-                                    'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
-                                actions: [
-                                  MaterialButton(
-                                      onPressed: () {
-                                        inputFocus.requestFocus();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              ),
-                            );
-                          } else {
-                            try {
-                              addQuestions();
-                            } catch (e) {
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 100,
+                        height: 40,
+                        child: MaterialButton(
+                          color: Colors.green,
+                          onPressed: () {
+                            if (topicID.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Error'),
+                                  content: const Text(
+                                      'Enter Topic ID in the topic field'),
+                                  actions: [
+                                    MaterialButton(
+                                        onPressed: () {
+                                          topicFocus.requestFocus();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ),
+                              );
+                            } else if (subjectID.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Error'),
+                                  content: const Text(
+                                      'Enter Subject ID in the subject field'),
+                                  actions: [
+                                    MaterialButton(
+                                        onPressed: () {
+                                          subjectFocus.requestFocus();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ),
+                              );
+                            } else if (jsonInputController.text.isEmpty) {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: const Text('Error'),
                                   content: Text(
-                                      'Entered JSON is not in correct format. looks like some keys or values are missing or invalid.\n${e.toString()}'),
+                                      'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
                                   actions: [
                                     MaterialButton(
                                         onPressed: () {
@@ -247,90 +242,90 @@ class _HomepageState extends State<Homepage> {
                                   ],
                                 ),
                               );
+                            } else {
+                              try {
+                                addQuestions();
+                              } catch (e) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Error'),
+                                    content: Text(
+                                        'Entered JSON is not in correct format. looks like some keys or values are missing or invalid.\n${e.toString()}'),
+                                    actions: [
+                                      MaterialButton(
+                                          onPressed: () {
+                                            inputFocus.requestFocus();
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'))
+                                    ],
+                                  ),
+                                );
+                              }
                             }
-                          }
-                        },
-                        child: const Text(
-                          "Add",
-                          style: TextStyle(color: Colors.white),
+                          },
+                          child: const Text(
+                            "Add",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 170,
-                      height: 40,
-                      child: MaterialButton(
-                        color: Colors.green,
-                        onPressed: () async {
-                          final clipBoardData =
-                              await Clipboard.getData(Clipboard.kTextPlain);
-                          jsonInputController.text =
-                              clipBoardData!.text.toString() ?? "";
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 170,
+                        height: 40,
+                        child: MaterialButton(
+                          color: Colors.green,
+                          onPressed: () async {
+                            final clipBoardData =
+                                await Clipboard.getData(Clipboard.kTextPlain);
+                            jsonInputController.text =
+                                clipBoardData!.text.toString() ?? "";
 
-                          if (topicID.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text(
-                                    'Enter Topic ID in the topic field'),
-                                actions: [
-                                  MaterialButton(
-                                      onPressed: () {
-                                        topicFocus.requestFocus();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              ),
-                            );
-                          } else if (subjectID.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error'),
-                                content: const Text(
-                                    'Enter Subject ID in the subject field'),
-                                actions: [
-                                  MaterialButton(
-                                      onPressed: () {
-                                        subjectFocus.requestFocus();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              ),
-                            );
-                          } else if (jsonInputController.text.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error'),
-                                content: Text(
-                                    'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
-                                actions: [
-                                  MaterialButton(
-                                      onPressed: () {
-                                        inputFocus.requestFocus();
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('OK'))
-                                ],
-                              ),
-                            );
-                          } else {
-                            try {
-                              addQuestions();
-                            } catch (e) {
+                            if (topicID.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Error'),
+                                  content: const Text(
+                                      'Enter Topic ID in the topic field'),
+                                  actions: [
+                                    MaterialButton(
+                                        onPressed: () {
+                                          topicFocus.requestFocus();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ),
+                              );
+                            } else if (subjectID.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Error'),
+                                  content: const Text(
+                                      'Enter Subject ID in the subject field'),
+                                  actions: [
+                                    MaterialButton(
+                                        onPressed: () {
+                                          subjectFocus.requestFocus();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'))
+                                  ],
+                                ),
+                              );
+                            } else if (jsonInputController.text.isEmpty) {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: const Text('Error'),
                                   content: Text(
-                                      'Entered JSON is not in correct format. looks like some keys or values are missing or invalid.\n${e.toString()}'),
+                                      'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
                                   actions: [
                                     MaterialButton(
                                         onPressed: () {
@@ -341,29 +336,49 @@ class _HomepageState extends State<Homepage> {
                                   ],
                                 ),
                               );
+                            } else {
+                              try {
+                                addQuestions();
+                              } catch (e) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Error'),
+                                    content: Text(
+                                        'Entered JSON is not in correct format. looks like some keys or values are missing or invalid.\n${e.toString()}'),
+                                    actions: [
+                                      MaterialButton(
+                                          onPressed: () {
+                                            inputFocus.requestFocus();
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('OK'))
+                                    ],
+                                  ),
+                                );
+                              }
                             }
-                          }
-                        },
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.settings_applications_outlined,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              "Reset | Paste | Add",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
+                          },
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.settings_applications_outlined,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                "Reset | Paste | Add",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -960,6 +975,12 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
+  void setCSV(String csv) {
+    setState(() {
+      jsonInputController.text = csv;
+    });
+  }
+
   @override
   void dispose() {
     scrollController.dispose();
@@ -1184,6 +1205,16 @@ class _HomepageState extends State<Homepage> {
         );
       },
     );
+  }
+
+  String getSysInstruction() {
+    return systemInstructions;
+  }
+
+  void setSysInstructions(String sysIns) {
+    setState(() {
+      systemInstructions = sysIns;
+    });
   }
 }
 

@@ -21,7 +21,8 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String systemInstructions = "";
+  String systemInstructionsForDescription = "";
+  String systemInstructionsForMCQs = "";
   bool useAi = true;
   bool isJSON = false;
   bool isAscendingOrder = true;
@@ -47,6 +48,7 @@ class _HomepageState extends State<Homepage> {
   String inputText =
       'Who was the first prime minister of Islamic Republic of Pakistan?,,,Liaqat Ali Khan,,,Quaid e Azam Muhammad Ali Jinnah,,,Zulfiqar Ali Bhutto,,,Chaudhary Rahmat Ali,,,Liaqat Ali Khan';
 
+  List<String> entries = [];
   List<Question> questions = [];
 
   @override
@@ -122,14 +124,26 @@ class _HomepageState extends State<Homepage> {
                 height: 10,
               ),
               if (useAi)
+                Boxed(
+                  child: AiWidget(
+                    clearEntries: clearEntries,
+                    subject: subjectID,
+                    topic: topicID,
+                    addQuestions: addQuestions,
+                    setCSV: setCSV,
+                    addEntry: addEntry,
+                  ),
+                ),
+              if (useAi)
                 Flexible(
-                  child: Boxed(
-                    child: AiWidget(
-                      subject: subjectID,
-                      topic: topicID,
-                      addQuestions: addQuestions,
-                      setCSV: setCSV,
-                    ),
+                  flex: 1,
+                  child: ListView.builder(
+                    itemCount: entries.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(entries[index]),
+                      );
+                    },
                   ),
                 ),
               if (!useAi)
@@ -926,6 +940,12 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
+  addEntry(String entry) {
+    setState(() {
+      entries.insert(0, entry);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1081,13 +1101,6 @@ class _HomepageState extends State<Homepage> {
     copyQuestions(temp, questions);
     addedQuestionCount = questions.length - questionsCount;
 
-    setState(() {
-      questions.shuffle();
-      for (var element in questions) {
-        element.answerOptions?.shuffle();
-      }
-    });
-
     if (kDebugMode) {
       print(questions.length);
       print(json.encode(questions));
@@ -1127,6 +1140,12 @@ class _HomepageState extends State<Homepage> {
       }
     }
     return false;
+  }
+
+  void clearEntries() {
+    setState(() {
+      entries.clear();
+    });
   }
 
   void editQuestion(int questionIndex) {
@@ -1207,13 +1226,23 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  String getSysInstruction() {
-    return systemInstructions;
+  String getSysInstructionsForDescription() {
+    return systemInstructionsForDescription;
   }
 
-  void setSysInstructions(String sysIns) {
+  void setSysInstructionsForDescription(String sysIns) {
     setState(() {
-      systemInstructions = sysIns;
+      systemInstructionsForDescription = sysIns;
+    });
+  }
+
+  String getSysInstructionForMCQs() {
+    return systemInstructionsForMCQs;
+  }
+
+  void setSysInstructionsForMCQs(String sysIns) {
+    setState(() {
+      systemInstructionsForMCQs = sysIns;
     });
   }
 }

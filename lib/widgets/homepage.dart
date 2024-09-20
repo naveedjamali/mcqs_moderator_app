@@ -1054,6 +1054,7 @@ class _HomepageState extends State<Homepage> {
         Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
         q.body = qBody;
         q.answerOptions = [];
+        bool shuffleAnswers = true;
 
         for (int i = 1; i < row.length; i++) {
           // create answer option.
@@ -1065,6 +1066,18 @@ class _HomepageState extends State<Homepage> {
               isCorrect: false);
           // check if the answer is already added.
 
+          String all = 'all of the above';
+          String none = 'none of the above';
+          String allThese = "all of these";
+          String noneThese = 'none of these';
+          String? ans = answer.body?.content.toString().toLowerCase();
+
+          if (ans == all ||
+              ans == none ||
+              ans == allThese ||
+              ans == noneThese) {
+            shuffleAnswers = false;
+          }
           if (containsAnswer(q.answerOptions ?? [], answer.body!.content)) {
             for (int i = 0; i < q.answerOptions!.length; i++) {
               if (q.answerOptions?[i].body?.content == answer.body?.content) {
@@ -1094,6 +1107,11 @@ class _HomepageState extends State<Homepage> {
         q.topicId = topicID;
         q.assignedPoints = 1;
         q.status = 'ACTIVE';
+
+        if (shuffleAnswers) {
+          q.answerOptions?.shuffle();
+        }
+
         temp.add(q);
       }
     }

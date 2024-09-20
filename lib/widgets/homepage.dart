@@ -50,6 +50,7 @@ class _HomepageState extends State<Homepage> {
 
   List<String> entries = [];
   List<Question> questions = [];
+  bool generatingResponse = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +82,7 @@ class _HomepageState extends State<Homepage> {
                           })
                         },
                         decoration: const InputDecoration(
+                          label: Text("Topic ID or Name"),
                           hintText: "Topic ID",
                           hintStyle: TextStyle(
                               color: Colors.grey, fontWeight: FontWeight.w400),
@@ -107,6 +109,7 @@ class _HomepageState extends State<Homepage> {
                           }),
                         },
                         decoration: const InputDecoration(
+                          label: Text("Subject ID or Name"),
                           hintText: "Subject ID",
                           hintStyle: TextStyle(
                               color: Colors.grey, fontWeight: FontWeight.w400),
@@ -132,6 +135,7 @@ class _HomepageState extends State<Homepage> {
                     addQuestions: addQuestions,
                     setCSV: setCSV,
                     addEntry: addEntry,
+                    setResponseLoading: setGeneratingResponse,
                   ),
                 ),
               if (useAi)
@@ -921,7 +925,26 @@ class _HomepageState extends State<Homepage> {
               "Examiter MCQs Moderator",
               style: TextStyle(color: Colors.white),
             ),
-            actions: const [],
+            actions: [
+              if (generatingResponse)
+                const Row(
+                  children: [
+                    Text(
+                      'Gemini is working',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
           body: Column(
             children: [
@@ -938,6 +961,12 @@ class _HomepageState extends State<Homepage> {
             ],
           )),
     );
+  }
+
+  void setGeneratingResponse(bool value) {
+    setState(() {
+      generatingResponse = value;
+    });
   }
 
   addEntry(String entry) {

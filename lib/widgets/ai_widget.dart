@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AiWidget extends StatefulWidget {
   AiWidget(
@@ -9,6 +10,7 @@ class AiWidget extends StatefulWidget {
       required this.addQuestions,
       required this.setCSV,
       required this.clearEntries,
+      required this.setResponseLoading,
       super.key});
 
   String subject;
@@ -17,6 +19,7 @@ class AiWidget extends StatefulWidget {
   Function setCSV;
   Function addEntry;
   Function clearEntries;
+  Function setResponseLoading;
 
   @override
   State<AiWidget> createState() => _AiWidgetState();
@@ -25,26 +28,28 @@ class AiWidget extends StatefulWidget {
 class _AiWidgetState extends State<AiWidget> {
   var descSysInsController = TextEditingController();
   var csvSysInsController = TextEditingController();
+
+  String descSysIns = "";
+  String mcqsSysIns = "";
+
   var inputController = TextEditingController(text: '');
   var inputFocusNode = FocusNode();
 
   bool editInstructions = false;
 
-  // late SharedPreferences preferences;
+  void getSysIns() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      descSysIns = pref.getString('desc_sys_ins') ?? '';
+      mcqsSysIns = pref.getString('mcqs_sys_ins') ?? '';
+
+      descSysInsController.text = descSysIns;
+      csvSysInsController.text = mcqsSysIns;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    descSysInsController.text = ""
-        "Subject: ${widget.subject},\nTopic: ${widget.topic},\nMinimum Length: 500 words\n"
-        "response includes: Actions, reactions, types, subtypes, uses, inventions, involvements and actors, dates, discoveries, formulas, history, and every detail in deep,"
-        "\nresponse type: in depth,\n"
-        "";
-    csvSysInsController.text = ""
-        "Generate minimum 30 MCQs from the given text into MCQs,"
-        "The output should be in given csv format,"
-        "use three commas ,,, as delimiter,"
-        "the sample output is: Question,,,Option1,,,Option2,,,Option3,,,Option4,,,CorrectAnswer";
-
     return Column(
       children: [
         Row(
@@ -61,10 +66,59 @@ class _AiWidgetState extends State<AiWidget> {
                             width: 500,
                             child: Column(
                               children: [
-                                TextField(
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  controller: descSysInsController,
+                                Text(descSysIns),
+                                Row(
+                                  children: [
+                                    FilledButton.icon(
+                                      onPressed: () => setState(() {
+                                        Navigator.of(context).pop();
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              content: Column(
+                                                children: [
+                                                  TextField(
+                                                    decoration:
+                                                        const InputDecoration(),
+                                                    keyboardType:
+                                                        TextInputType.multiline,
+                                                    maxLines: null,
+                                                    controller:
+                                                        descSysInsController,
+                                                  ),
+                                                ],
+                                              ),
+                                              actions: [
+                                                FilledButton(
+                                                    onPressed: () {
+                                                      descSysIns =
+                                                          descSysInsController
+                                                              .text;
+                                                      saveSysIns();
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: const Text(
+                                                        'Save and Close'))
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      }),
+                                      icon: const Icon(Icons.edit_note),
+                                      label: const Text('Edit'),
+                                    ),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    FilledButton(
+                                        onPressed: () {
+                                          defaultSysIns();
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Load default')),
+                                  ],
                                 ),
                               ],
                             ),
@@ -94,10 +148,59 @@ class _AiWidgetState extends State<AiWidget> {
                           width: 500,
                           child: Column(
                             children: [
-                              TextField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                controller: csvSysInsController,
+                              Text(mcqsSysIns),
+                              Row(
+                                children: [
+                                  FilledButton.icon(
+                                    onPressed: () => setState(() {
+                                      Navigator.of(context).pop();
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            content: Column(
+                                              children: [
+                                                TextField(
+                                                  decoration:
+                                                      const InputDecoration(),
+                                                  keyboardType:
+                                                      TextInputType.multiline,
+                                                  maxLines: null,
+                                                  controller:
+                                                      csvSysInsController,
+                                                ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              FilledButton(
+                                                  onPressed: () {
+                                                    mcqsSysIns =
+                                                        csvSysInsController
+                                                            .text;
+                                                    saveSysIns();
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text(
+                                                      'Save and Close'))
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }),
+                                    icon: const Icon(Icons.edit_note),
+                                    label: const Text('Edit'),
+                                  ),
+                                  const SizedBox(
+                                    width: 16,
+                                  ),
+                                  FilledButton(
+                                      onPressed: () {
+                                        defaultSysIns();
+
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Load default')),
+                                ],
                               ),
                             ],
                           ),
@@ -147,6 +250,8 @@ class _AiWidgetState extends State<AiWidget> {
                     } else {
                       String text = inputController.text;
                       widget.addEntry(text);
+                      widget.setResponseLoading(true);
+
                       getAIDescription(descSysInsController.text, text).then(
                         (description) {
                           if (description != null) {
@@ -154,6 +259,7 @@ class _AiWidgetState extends State<AiWidget> {
                               (csv) {
                                 widget.setCSV(csv);
                                 widget.addQuestions();
+                                widget.setResponseLoading(false);
                               },
                             );
                           }
@@ -190,7 +296,7 @@ class _AiWidgetState extends State<AiWidget> {
 
   Future<String?> askAI(String instructions, String query) async {
     // Access your API key as an environment variable (see "Set up your API key" above)
-    const apiKey = 'AIzaSyAPQfSUYwWpD8vIEa3flcukzeve63hLrG0';
+    const apiKey = String.fromEnvironment('API_KEY');
 
     final model = GenerativeModel(
       model: 'gemini-1.5-flash',
@@ -204,5 +310,29 @@ class _AiWidgetState extends State<AiWidget> {
     final response = await model.generateContent([Content.text(prompt)]);
     print(response.text);
     return response.text;
+  }
+
+  void saveSysIns() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('mcqs_sys_ins', mcqsSysIns);
+    pref.setString('desc_sys_ins', descSysIns);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    getSysIns();
+  }
+
+  void defaultSysIns() {
+    setState(() {
+      descSysIns =
+          "Subject: General Knowledge, Topic: Pakistan Study, Minimum Length: 1000 words response includes: Actions, reactions, types, subtypes, uses, inventions, involvements and actors, dates, discoveries, formulas, history, and every detail in deep, response type: in depth,";
+      mcqsSysIns =
+          "Generate minimum 30 MCQs from the given text into MCQs,The output should be in given csv format,use three commas ,,, as delimiter,the sample output is: Question,,,Option1,,,Option2,,,Option3,,,Option4,,,CorrectAnswer";
+      saveSysIns();
+    });
   }
 }

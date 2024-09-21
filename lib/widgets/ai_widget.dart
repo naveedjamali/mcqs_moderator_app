@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -298,6 +299,30 @@ class _AiWidgetState extends State<AiWidget> {
     // Access your API key as an environment variable (see "Set up your API key" above)
     const apiKey = String.fromEnvironment('API_KEY');
 
+    if (apiKey == null) {
+      if (kDebugMode) {
+        print('No \$API_KEY environment variable');
+      }
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('API Key error'),
+          content: const Text('No API key found, contact developers.'),
+          icon: const Icon(
+            Icons.error,
+            color: Colors.red,
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+
+            )
+          ],
+        ),
+      );
+    }
+
     final model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
@@ -329,7 +354,7 @@ class _AiWidgetState extends State<AiWidget> {
   void defaultSysIns() {
     setState(() {
       descSysIns =
-          "Subject: General Knowledge, Topic: Pakistan Study, Minimum Length: 1000 words response includes: Actions, reactions, types, subtypes, uses, inventions, involvements and actors, dates, discoveries, formulas, history, and every detail in deep, response type: in depth,";
+          "Subject: ${widget.subject}, Topic: ${widget.topic}, Minimum Length: 1000 words response includes: Actions, reactions, types, subtypes, uses, inventions, involvements and actors, dates, discoveries, formulas, history, and every detail in deep, response type: in depth,";
       mcqsSysIns =
           "Generate minimum 30 MCQs from the given text into MCQs,The output should be in given csv format,use three commas ,,, as delimiter,the sample output is: Question,,,Option1,,,Option2,,,Option3,,,Option4,,,CorrectAnswer";
       saveSysIns();

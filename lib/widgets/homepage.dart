@@ -145,7 +145,7 @@ class _HomepageState extends State<Homepage> {
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(entries[index]),
+                        title: SelectableText(entries[index],),
                       );
                     },
                   ),

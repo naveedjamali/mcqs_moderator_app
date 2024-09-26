@@ -145,7 +145,9 @@ class _HomepageState extends State<Homepage> {
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: SelectableText(entries[index],),
+                        title: SelectableText(
+                          entries[index],
+                        ),
                       );
                     },
                   ),
@@ -874,6 +876,18 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
                 ),
+                FilledButton(
+                    onPressed: () async {
+                      String apiKey = const String.fromEnvironment('API_KEY');
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('API KEY'),
+                          content: Text(apiKey),
+                        ),
+                      );
+                    },
+                    child: const Text('Show API Key')),
                 const Text(
                   'Current Input Format: ',
                 ),

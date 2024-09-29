@@ -8,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/widgets/ai_widget.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,7 +30,16 @@ class _HomepageState extends State<Homepage> {
   FocusNode topicFocus = FocusNode();
   FocusNode subjectFocus = FocusNode();
   FocusNode inputFocus = FocusNode();
-  final scrollController = ScrollController(keepScrollOffset: true);
+
+  // final scrollController = ScrollController(keepScrollOffset: true);
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ScrollOffsetController scrollOffsetController =
+      ScrollOffsetController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+  final ScrollOffsetListener scrollOffsetListener =
+      ScrollOffsetListener.create();
+
   final randColors = [Colors.red, Colors.blue, Colors.yellow, Colors.brown];
 
   // final JsonFileIo jsonFileIo = JsonFileIo();
@@ -642,8 +652,11 @@ class _HomepageState extends State<Homepage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     //child: Text('Nothing to show'),
-                    child: ListView.builder(
-                      controller: scrollController,
+                    child: ScrollablePositionedList.builder(
+                      itemScrollController: itemScrollController,
+                      scrollOffsetController: scrollOffsetController,
+                      itemPositionsListener: itemPositionsListener,
+                      scrollOffsetListener: scrollOffsetListener,
                       key: UniqueKey(),
                       itemBuilder: (context, questionIndex) {
                         return ListTile(
@@ -1046,7 +1059,8 @@ class _HomepageState extends State<Homepage> {
 
   @override
   void dispose() {
-    scrollController.dispose();
+    //scrollController.dispose();
+
     super.dispose();
   }
 
@@ -1159,7 +1173,11 @@ class _HomepageState extends State<Homepage> {
       }
     }
     int questionsCount = questions.length;
+    int lastIndex = questions.length - 1;
     copyQuestions(temp, questions);
+    //itemScrollController.jumpTo(index: lastIndex + 1);
+
+
     addedQuestionCount = questions.length - questionsCount;
 
     if (kDebugMode) {
@@ -1187,6 +1205,9 @@ class _HomepageState extends State<Homepage> {
         ),
       );
     });
+
+
+    itemScrollController.jumpTo(index: lastIndex);
   }
 
   bool containsAnswer(

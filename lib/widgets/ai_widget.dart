@@ -326,7 +326,9 @@ class _AiWidgetState extends State<AiWidget> {
     final model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
-      generationConfig: GenerationConfig(temperature: 1),
+
+      safetySettings: [SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none,),],
+      generationConfig: GenerationConfig(temperature: 1,  ),
       systemInstruction: Content.system(instructions),
     );
 

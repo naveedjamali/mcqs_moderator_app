@@ -253,22 +253,38 @@ class _AiWidgetState extends State<AiWidget> {
                       widget.addEntry(text);
                       widget.setResponseLoading(true);
 
-                      getAIDescription(descSysInsController.text, text).then(
-                        (description) {
-                          if (description != null) {
-                            getCsvResponse(description).then(
-                              (csv) {
-                                widget.setCSV(csv);
-                                widget.addQuestions();
-                                widget.setResponseLoading(false);
-                              },
-                            );
-                          }
-                        },
-                      );
+                      try {
+                        getAIDescription(descSysInsController.text, text);
 
-                      inputController.text = "";
-                      inputFocusNode.requestFocus();
+                        inputController.text = "";
+                        inputFocusNode.requestFocus();
+                      } catch (e) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            final errorTextController = TextEditingController();
+                            errorTextController.text =
+                                descSysInsController.text;
+                            return AlertDialog(
+                              title: const Text('Error'),
+                              content: Column(
+                                children: [
+                                  Text(e.toString()),
+                                  const Text(
+                                      'Re-write your query and try again'),
+                                  TextFormField(
+                                    controller: errorTextController,
+                                  ),
+
+                                ],
+                              ),
+                              actions: [ElevatedButton(onPressed: () {
+
+                              }, child: const Text('Go'))],
+                            );
+                          },
+                        );
+                      }
                     }
                   },
                   decoration: const InputDecoration(
@@ -286,8 +302,19 @@ class _AiWidgetState extends State<AiWidget> {
     );
   }
 
-  Future<String?> getAIDescription(String sysIns, String keywords) async {
-    return askAI(sysIns, keywords);
+  void getAIDescription(String sysIns, String keywords) async {
+
+     askAI(sysIns, keywords).then((desc){
+       if (desc != null) {
+         getCsvResponse(desc).then(
+               (csv) {
+             widget.setCSV(csv);
+             widget.addQuestions();
+             widget.setResponseLoading(false);
+           },
+         );
+       }
+     });
   }
 
   Future<String?> getCsvResponse(String description) async {
@@ -316,7 +343,6 @@ class _AiWidgetState extends State<AiWidget> {
             FilledButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Close'),
-
             )
           ],
         ),
@@ -326,9 +352,15 @@ class _AiWidgetState extends State<AiWidget> {
     final model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
-
-      safetySettings: [SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none,),],
-      generationConfig: GenerationConfig(temperature: 1,  ),
+      safetySettings: [
+        SafetySetting(
+          HarmCategory.sexuallyExplicit,
+          HarmBlockThreshold.none,
+        ),
+      ],
+      generationConfig: GenerationConfig(
+        temperature: 1,
+      ),
       systemInstruction: Content.system(instructions),
     );
 

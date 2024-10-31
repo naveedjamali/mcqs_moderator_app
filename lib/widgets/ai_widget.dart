@@ -275,12 +275,12 @@ class _AiWidgetState extends State<AiWidget> {
                                   TextFormField(
                                     controller: errorTextController,
                                   ),
-
                                 ],
                               ),
-                              actions: [ElevatedButton(onPressed: () {
-
-                              }, child: const Text('Go'))],
+                              actions: [
+                                ElevatedButton(
+                                    onPressed: () {}, child: const Text('Go'))
+                              ],
                             );
                           },
                         );
@@ -303,18 +303,17 @@ class _AiWidgetState extends State<AiWidget> {
   }
 
   void getAIDescription(String sysIns, String keywords) async {
-
-     askAI(sysIns, keywords).then((desc){
-       if (desc != null) {
-         getCsvResponse(desc).then(
-               (csv) {
-             widget.setCSV(csv);
-             widget.addQuestions();
-             widget.setResponseLoading(false);
-           },
-         );
-       }
-     });
+    askAI(sysIns, keywords).then((desc) {
+      if (desc != null) {
+        getCsvResponse(desc).then(
+          (csv) {
+            widget.setCSV(csv);
+            widget.addQuestions();
+            widget.setResponseLoading(false);
+          },
+        );
+      }
+    });
   }
 
   Future<String?> getCsvResponse(String description) async {
@@ -326,7 +325,7 @@ class _AiWidgetState extends State<AiWidget> {
     // Access your API key as an environment variable (see "Set up your API key" above)
     const apiKey = String.fromEnvironment('API_KEY');
 
-    if (apiKey == null) {
+    if (apiKey.length < 1) {
       if (kDebugMode) {
         print('No \$API_KEY environment variable');
       }

@@ -313,7 +313,7 @@ class _HomepageState extends State<Homepage> {
                             final clipBoardData =
                                 await Clipboard.getData(Clipboard.kTextPlain);
                             jsonInputController.text =
-                                clipBoardData!.text.toString() ?? "";
+                                clipBoardData!.text.toString();
 
                             if (topicID.isEmpty) {
                               showDialog(
@@ -1177,7 +1177,6 @@ class _HomepageState extends State<Homepage> {
     copyQuestions(temp, questions);
     //itemScrollController.jumpTo(index: lastIndex + 1);
 
-
     addedQuestionCount = questions.length - questionsCount;
 
     if (kDebugMode) {
@@ -1205,7 +1204,6 @@ class _HomepageState extends State<Homepage> {
         ),
       );
     });
-
 
     itemScrollController.jumpTo(index: lastIndex);
   }

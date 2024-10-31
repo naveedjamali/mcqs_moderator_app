@@ -8,20 +8,20 @@ class Question {
 
   Question(
       {this.body,
-        this.status,
-        this.assignedPoints,
-        this.answerOptions,
-        this.topicId,
-        this.subjectId});
+      this.status,
+      this.assignedPoints,
+      this.answerOptions,
+      this.topicId,
+      this.subjectId});
 
   Question.fromJson(Map<String, dynamic> json) {
-    body = json['body'] != null ? new Body.fromJson(json['body']) : null;
+    body = json['body'] != null ? Body.fromJson(json['body']) : null;
     status = json['status'];
     assignedPoints = json['assignedPoints'];
     if (json['answerOptions'] != null) {
       answerOptions = <AnswerOptions>[];
       json['answerOptions'].forEach((v) {
-        answerOptions!.add(new AnswerOptions.fromJson(v));
+        answerOptions!.add(AnswerOptions.fromJson(v));
       });
     }
     topicId = json['topicId'];
@@ -29,18 +29,17 @@ class Question {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.body != null) {
-      data['body'] = this.body!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (body != null) {
+      data['body'] = body!.toJson();
     }
-    data['status'] = this.status;
-    data['assignedPoints'] = this.assignedPoints;
-    if (this.answerOptions != null) {
-      data['answerOptions'] =
-          this.answerOptions!.map((v) => v.toJson()).toList();
+    data['status'] = status;
+    data['assignedPoints'] = assignedPoints;
+    if (answerOptions != null) {
+      data['answerOptions'] = answerOptions!.map((v) => v.toJson()).toList();
     }
-    data['topicId'] = this.topicId;
-    data['subjectId'] = this.subjectId;
+    data['topicId'] = topicId;
+    data['subjectId'] = subjectId;
     return data;
   }
 }
@@ -57,9 +56,9 @@ class Body {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['content'] = this.content;
-    data['contentType'] = this.contentType;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['content'] = content;
+    data['contentType'] = contentType;
     return data;
   }
 }
@@ -71,16 +70,16 @@ class AnswerOptions {
   AnswerOptions({this.body, this.isCorrect});
 
   AnswerOptions.fromJson(Map<String, dynamic> json) {
-    body = json['body'] != null ? new Body.fromJson(json['body']) : null;
+    body = json['body'] != null ? Body.fromJson(json['body']) : null;
     isCorrect = json['isCorrect'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.body != null) {
-      data['body'] = this.body!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (body != null) {
+      data['body'] = body!.toJson();
     }
-    data['isCorrect'] = this.isCorrect;
+    data['isCorrect'] = isCorrect;
     return data;
   }
 }
@@ -95,8 +94,10 @@ class InputQuestions {
       values = <Values>[];
       json['values'].forEach((v) {
         List<String> a = [];
-        Map<String,dynamic> b = v;
-        b.entries.forEach((st){a.add(st.value.toString());});
+        Map<String, dynamic> b = v;
+        for (var st in b.entries) {
+          a.add(st.value.toString());
+        }
         values.add(
           Values(
             answers: a,

@@ -652,12 +652,12 @@ class _HomepageState extends State<Homepage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     //child: Text('Nothing to show'),
-                    child: ScrollablePositionedList.builder(
-                      itemScrollController: itemScrollController,
-                      scrollOffsetController: scrollOffsetController,
-                      itemPositionsListener: itemPositionsListener,
-                      scrollOffsetListener: scrollOffsetListener,
-                      key: UniqueKey(),
+                    child: ListView.builder(
+                      // itemScrollController: itemScrollController,
+                      // scrollOffsetController: scrollOffsetController,
+                      // itemPositionsListener: itemPositionsListener,
+                      // scrollOffsetListener: scrollOffsetListener,
+                      key: const PageStorageKey<String>('page'),
                       itemBuilder: (context, questionIndex) {
                         return ListTile(
                           title: ListTile(
@@ -889,18 +889,6 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
                 ),
-                FilledButton(
-                    onPressed: () async {
-                      String apiKey = const String.fromEnvironment('API_KEY');
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('API KEY'),
-                          content: Text(apiKey),
-                        ),
-                      );
-                    },
-                    child: const Text('Show API Key')),
                 const Text(
                   'Current Input Format: ',
                 ),
@@ -1204,8 +1192,6 @@ class _HomepageState extends State<Homepage> {
         ),
       );
     });
-
-    itemScrollController.jumpTo(index: lastIndex);
   }
 
   bool containsAnswer(

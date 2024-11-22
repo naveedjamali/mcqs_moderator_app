@@ -22,10 +22,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  String systemInstructionsForDescription = "";
-  String systemInstructionsForMCQs = "";
   bool useAi = true;
-  bool isJSON = false;
   bool isAscendingOrder = true;
   FocusNode topicFocus = FocusNode();
   FocusNode subjectFocus = FocusNode();
@@ -170,8 +167,7 @@ class _HomepageState extends State<Homepage> {
                       focusNode: inputFocus,
                       decoration: InputDecoration(
                           border: null,
-                          hintText:
-                              "write or paste your ${isJSON ? 'JSON' : 'CSV'} here...",
+                          hintText: "write or paste your text here...",
                           hintStyle: const TextStyle(
                               fontWeight: FontWeight.w300, color: Colors.grey)),
                       controller: jsonInputController,
@@ -261,7 +257,7 @@ class _HomepageState extends State<Homepage> {
                                 builder: (context) => AlertDialog(
                                   title: const Text('Error'),
                                   content: Text(
-                                      'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
+                                      'Input text in the input box to add questions'),
                                   actions: [
                                     MaterialButton(
                                         onPressed: () {
@@ -355,7 +351,7 @@ class _HomepageState extends State<Homepage> {
                                 builder: (context) => AlertDialog(
                                   title: const Text('Error'),
                                   content: Text(
-                                      'Input ${isJSON ? 'JSON' : 'CSV'} in the input box to add questions'),
+                                      'Input text in the input box to add questions'),
                                   actions: [
                                     MaterialButton(
                                         onPressed: () {
@@ -889,42 +885,6 @@ class _HomepageState extends State<Homepage> {
                     ],
                   ),
                 ),
-                const Text(
-                  'Current Input Format: ',
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                DropdownButton(
-                  //dropdownColor: Colors.white,
-                  // elevation: 5,
-                  isExpanded: true,
-                  hint: const Text('Change input format'),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-
-                  icon: const Icon(
-                    Icons.arrow_drop_down,
-                  ),
-                  value: isJSON ? 'JSON' : 'CSV',
-                  items: <String>['JSON', 'CSV']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      alignment: Alignment.bottomLeft,
-                      value: value,
-                      child: Center(
-                          child: Text(
-                        value,
-                        style: const TextStyle(color: Colors.green),
-                      )),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      isJSON = value == 'JSON';
-                    });
-                    _savePreference(isJSON);
-                  },
-                ),
                 const SizedBox(
                   height: 500,
                 ),
@@ -993,19 +953,6 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    _loadPreference();
-  }
-
-  _loadPreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isJSON = prefs.getBool('isJson') ?? false;
-    });
-  }
-
-  _savePreference(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isJson', value);
   }
 
   void _sortByName() {
@@ -1059,107 +1006,96 @@ class _HomepageState extends State<Homepage> {
 
     String input = jsonInputController.text.trim();
     List<Question> temp = [];
-    if (isJSON) {
-      input = input.replaceAll('\r', ' ').replaceAll('\n', ' ');
-      final l = json.decode(input);
 
-      temp.insertAll(
-        0,
-        List<Question>.from(
-          l.map(
-            (model) {
-              Question q = Question.fromJson(model);
-              q.topicId = topicID;
-              q.subjectId = subjectID;
-              return q;
-            },
-          ),
-        ),
-      );
-    } else {
-      input.replaceAll('\n', '');
-      List<List<dynamic>> rows = const CsvToListConverter().convert(
-        input,
-        fieldDelimiter: ',,,',
-        eol: '\n',
-        shouldParseNumbers: true,
-        convertEmptyTo: '\n',
-        allowInvalid: false,
-      );
-      // const csvConverter = CsvToListConverter();
-      //csvConverter;
-      for (List<dynamic> row in rows) {
-        if (row.length < 3) {
-          // Invalid question
-          continue;
-        }
-        //Create question
-        Question q = Question();
+    String delimiter = ',,,';
 
-        Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
-        q.body = qBody;
-        q.answerOptions = [];
-        bool shuffleAnswers = true;
-
-        for (int i = 1; i < row.length; i++) {
-          // create answer option.
-
-          AnswerOptions answer = AnswerOptions(
-              body:
-                  Body(content: row[i].toString().trim(), contentType: 'PLAIN'),
-              // isCorrect: row[i] == row[row.length - 1]);
-              isCorrect: false);
-          // check if the answer is already added.
-
-          String all = 'all of the above';
-          String none = 'none of the above';
-          String allThese = "all of these";
-          String noneThese = 'none of these';
-          String? ans = answer.body?.content.toString().toLowerCase();
-
-          if (ans == all ||
-              ans == none ||
-              ans == allThese ||
-              ans == noneThese) {
-            shuffleAnswers = false;
-          }
-          if (containsAnswer(q.answerOptions ?? [], answer.body!.content)) {
-            for (int i = 0; i < q.answerOptions!.length; i++) {
-              if (q.answerOptions?[i].body?.content == answer.body?.content) {
-                q.answerOptions?[i].isCorrect = true;
-                break;
-              }
-            }
-          } else {
-            q.answerOptions?.add(answer);
-          }
-        }
-
-        //check that at least one answer is correct in the question.
-        bool containCorrectAnswer = false;
-        q.answerOptions?.forEach(
-          (element) {
-            if (element.isCorrect ?? false) {
-              containCorrectAnswer = true;
-            }
-          },
-        );
-        if (!containCorrectAnswer) {
-          continue;
-        }
-
-        q.subjectId = subjectID;
-        q.topicId = topicID;
-        q.assignedPoints = 1;
-        q.status = 'ACTIVE';
-
-        if (shuffleAnswers) {
-          q.answerOptions?.shuffle();
-        }
-
-        temp.add(q);
-      }
+    if (input.contains(',,,,')) {
+      delimiter = ',,,,';
+    } else if (input.contains(',,,')) {
+      delimiter = ',,,';
+    } else if (input.contains(',,')) {
+      delimiter = ',,';
     }
+
+    input.replaceAll('\n', '');
+    List<List<dynamic>> rows = const CsvToListConverter().convert(
+      input,
+      fieldDelimiter: delimiter,
+      eol: '\n',
+      shouldParseNumbers: true,
+      convertEmptyTo: '\n',
+      allowInvalid: false,
+    );
+    // const csvConverter = CsvToListConverter();
+    //csvConverter;
+    for (List<dynamic> row in rows) {
+      if (row.length < 3) {
+        // Invalid question
+        continue;
+      }
+      //Create question
+      Question q = Question();
+
+      Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
+      q.body = qBody;
+      q.answerOptions = [];
+      bool shuffleAnswers = true;
+
+      for (int i = 1; i < row.length; i++) {
+        // create answer option.
+
+        AnswerOptions answer = AnswerOptions(
+            body: Body(content: row[i].toString().trim(), contentType: 'PLAIN'),
+            // isCorrect: row[i] == row[row.length - 1]);
+            isCorrect: false);
+        // check if the answer is already added.
+
+        String all = 'all of the above';
+        String none = 'none of the above';
+        String allThese = "all of these";
+        String noneThese = 'none of these';
+        String? ans = answer.body?.content.toString().toLowerCase();
+
+        if (ans == all || ans == none || ans == allThese || ans == noneThese) {
+          shuffleAnswers = false;
+        }
+        if (containsAnswer(q.answerOptions ?? [], answer.body!.content)) {
+          for (int i = 0; i < q.answerOptions!.length; i++) {
+            if (q.answerOptions?[i].body?.content == answer.body?.content) {
+              q.answerOptions?[i].isCorrect = true;
+              break;
+            }
+          }
+        } else {
+          q.answerOptions?.add(answer);
+        }
+      }
+
+      //check that at least one answer is correct in the question.
+      bool containCorrectAnswer = false;
+      q.answerOptions?.forEach(
+        (element) {
+          if (element.isCorrect ?? false) {
+            containCorrectAnswer = true;
+          }
+        },
+      );
+      if (!containCorrectAnswer) {
+        continue;
+      }
+
+      q.subjectId = subjectID;
+      q.topicId = topicID;
+      q.assignedPoints = 1;
+      q.status = 'ACTIVE';
+
+      if (shuffleAnswers) {
+        q.answerOptions?.shuffle();
+      }
+
+      temp.add(q);
+    }
+
     int questionsCount = questions.length;
     int lastIndex = questions.length - 1;
     copyQuestions(temp, questions);
@@ -1290,26 +1226,6 @@ class _HomepageState extends State<Homepage> {
         );
       },
     );
-  }
-
-  String getSysInstructionsForDescription() {
-    return systemInstructionsForDescription;
-  }
-
-  void setSysInstructionsForDescription(String sysIns) {
-    setState(() {
-      systemInstructionsForDescription = sysIns;
-    });
-  }
-
-  String getSysInstructionForMCQs() {
-    return systemInstructionsForMCQs;
-  }
-
-  void setSysInstructionsForMCQs(String sysIns) {
-    setState(() {
-      systemInstructionsForMCQs = sysIns;
-    });
   }
 }
 

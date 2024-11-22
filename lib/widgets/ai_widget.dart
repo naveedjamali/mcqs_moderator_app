@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AiWidget extends StatefulWidget {
   AiWidget(
@@ -27,27 +26,10 @@ class AiWidget extends StatefulWidget {
 }
 
 class _AiWidgetState extends State<AiWidget> {
-  var descSysInsController = TextEditingController();
-  var csvSysInsController = TextEditingController();
-
-  String descSysIns = "";
-  String mcqsSysIns = "";
-
   var inputController = TextEditingController(text: '');
   var inputFocusNode = FocusNode();
 
   bool editInstructions = false;
-
-  void getSysIns() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      descSysIns = pref.getString('desc_sys_ins') ?? '';
-      mcqsSysIns = pref.getString('mcqs_sys_ins') ?? '';
-
-      descSysInsController.text = descSysIns;
-      csvSysInsController.text = mcqsSysIns;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,171 +37,6 @@ class _AiWidgetState extends State<AiWidget> {
       children: [
         Row(
           children: [
-            TextButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Description SysIns'),
-                        content: SingleChildScrollView(
-                          child: SizedBox(
-                            width: 500,
-                            child: Column(
-                              children: [
-                                Text(descSysIns),
-                                Row(
-                                  children: [
-                                    FilledButton.icon(
-                                      onPressed: () => setState(() {
-                                        Navigator.of(context).pop();
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              content: Column(
-                                                children: [
-                                                  TextField(
-                                                    decoration:
-                                                        const InputDecoration(),
-                                                    keyboardType:
-                                                        TextInputType.multiline,
-                                                    maxLines: null,
-                                                    controller:
-                                                        descSysInsController,
-                                                  ),
-                                                ],
-                                              ),
-                                              actions: [
-                                                FilledButton(
-                                                    onPressed: () {
-                                                      descSysIns =
-                                                          descSysInsController
-                                                              .text;
-                                                      saveSysIns();
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text(
-                                                        'Save and Close'))
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      }),
-                                      icon: const Icon(Icons.edit_note),
-                                      label: const Text('Edit'),
-                                    ),
-                                    const SizedBox(
-                                      width: 16,
-                                    ),
-                                    FilledButton(
-                                        onPressed: () {
-                                          defaultSysIns();
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Load default')),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        actions: [
-                          FilledButton.icon(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              label: const Text('Close'))
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: const Text('Description SysIns')),
-            TextButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text('MCQs SysIns'),
-                      content: SingleChildScrollView(
-                        child: SizedBox(
-                          width: 500,
-                          child: Column(
-                            children: [
-                              Text(mcqsSysIns),
-                              Row(
-                                children: [
-                                  FilledButton.icon(
-                                    onPressed: () => setState(() {
-                                      Navigator.of(context).pop();
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            content: Column(
-                                              children: [
-                                                TextField(
-                                                  decoration:
-                                                      const InputDecoration(),
-                                                  keyboardType:
-                                                      TextInputType.multiline,
-                                                  maxLines: null,
-                                                  controller:
-                                                      csvSysInsController,
-                                                ),
-                                              ],
-                                            ),
-                                            actions: [
-                                              FilledButton(
-                                                  onPressed: () {
-                                                    mcqsSysIns =
-                                                        csvSysInsController
-                                                            .text;
-                                                    saveSysIns();
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text(
-                                                      'Save and Close'))
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }),
-                                    icon: const Icon(Icons.edit_note),
-                                    label: const Text('Edit'),
-                                  ),
-                                  const SizedBox(
-                                    width: 16,
-                                  ),
-                                  FilledButton(
-                                      onPressed: () {
-                                        defaultSysIns();
-
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('Load default')),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      actions: [
-                        FilledButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            label: const Text('Close'))
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Text('MCQs SysIns'),
-            ),
             TextButton.icon(
               onPressed: () {
                 widget.clearEntries();
@@ -254,7 +71,7 @@ class _AiWidgetState extends State<AiWidget> {
                       widget.setResponseLoading(true);
 
                       try {
-                        getAIDescription(descSysInsController.text, text);
+                        getAIDescription(text);
 
                         inputController.text = "";
                         inputFocusNode.requestFocus();
@@ -263,8 +80,7 @@ class _AiWidgetState extends State<AiWidget> {
                           context: context,
                           builder: (context) {
                             final errorTextController = TextEditingController();
-                            errorTextController.text =
-                                descSysInsController.text;
+
                             return AlertDialog(
                               title: const Text('Error'),
                               content: Column(
@@ -302,8 +118,18 @@ class _AiWidgetState extends State<AiWidget> {
     );
   }
 
-  void getAIDescription(String sysIns, String keywords) async {
-    askAI(sysIns, keywords).then((desc) {
+  void getAIDescription(String keywords) async {
+    final ins = Content.multi([
+      TextPart('Subject: ${widget.subject}'),
+      TextPart('Topic: ${widget.topic}'),
+      TextPart('Generate a detailed essay on the given topic'),
+      TextPart('essay length: 2000 words minimum'),
+      TextPart('essay type: in-depth'),
+      TextPart(
+          'include: history, actions, reactions, parts, sub-parts, examples, formulas, measurements, structure, importance, inventions, discoveries, scientists, artists, uses, involvements, dates, types, subtypes, etc'),
+    ]);
+
+    askAI(ins, keywords).then((desc) {
       if (desc != null) {
         getCsvResponse(desc).then(
           (csv) {
@@ -317,15 +143,23 @@ class _AiWidgetState extends State<AiWidget> {
   }
 
   Future<String?> getCsvResponse(String description) async {
-    String? csv = await askAI(csvSysInsController.text, description);
+    final ins = Content.multi(
+      [
+        TextPart(
+            'CSV output format: Question ,,, Option1 ,,, Option2 ,,, Option3 ,,, Option4 ,,, CorrectAnswer'),
+        TextPart('Generate minimum 30 MCQss in the csv format'),
+        TextPart('use three commas \',,,\' as delimiter')
+      ],
+    );
+    String? csv = await askAI(ins, description);
     return csv;
   }
 
-  Future<String?> askAI(String instructions, String query) async {
+  Future<String?> askAI(Content instructions, String query) async {
     // Access your API key as an environment variable (see "Set up your API key" above)
     const apiKey = String.fromEnvironment('API_KEY');
 
-    if (apiKey.length < 1) {
+    if (apiKey.isEmpty) {
       if (kDebugMode) {
         print('No \$API_KEY environment variable');
       }
@@ -349,7 +183,7 @@ class _AiWidgetState extends State<AiWidget> {
     }
 
     final model = GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-flash-002',
       apiKey: apiKey,
       safetySettings: [
         SafetySetting(
@@ -360,37 +194,27 @@ class _AiWidgetState extends State<AiWidget> {
       generationConfig: GenerationConfig(
         temperature: 1,
       ),
-      systemInstruction: Content.system(instructions),
+      // systemInstruction: Content.multi([TextPart('')]),
+      systemInstruction: instructions,
     );
 
     var prompt = query;
 
-    final response = await model.generateContent([Content.text(prompt)]);
-    print(response.text);
-    return response.text;
-  }
+    try {
+      final response = await model.generateContent([Content.text(prompt)]);
 
-  void saveSysIns() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString('mcqs_sys_ins', mcqsSysIns);
-    pref.setString('desc_sys_ins', descSysIns);
+      if (kDebugMode) {
+        print(response.text);
+      }
+      return response.text;
+    } catch (error) {
+      return error.toString();
+    }
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    getSysIns();
-  }
-
-  void defaultSysIns() {
-    setState(() {
-      descSysIns =
-          "Subject: ${widget.subject}, Topic: ${widget.topic}, Minimum Length: 1000 words response includes: Actions, reactions, types, subtypes, uses, inventions, involvements and actors, dates, discoveries, formulas, history, and every detail in deep, response type: in depth,";
-      mcqsSysIns =
-          "Generate minimum 30 MCQs from the given text into MCQs,The output should be in given csv format,use three commas ,,, as delimiter,the sample output is: Question,,,Option1,,,Option2,,,Option3,,,Option4,,,CorrectAnswer";
-      saveSysIns();
-    });
   }
 }

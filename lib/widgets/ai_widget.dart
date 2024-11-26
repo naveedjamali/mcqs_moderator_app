@@ -26,7 +26,8 @@ class AiWidget extends StatefulWidget {
 }
 
 class _AiWidgetState extends State<AiWidget> {
-  var inputController = TextEditingController(text: '');
+  var inputController =
+      TextEditingController(text: 'RAM vs ROM: A brief guide');
   var inputFocusNode = FocusNode();
 
   bool editInstructions = false;

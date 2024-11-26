@@ -39,10 +39,10 @@ class _HomepageState extends State<Homepage> {
   // final JsonFileIo jsonFileIo = JsonFileIo();
 
   final topicController = TextEditingController(
-    text: 'Pakistan Study',
+    text: 'Computer System',
   );
   final subjectController = TextEditingController(
-    text: 'General Knowledge',
+    text: 'Computer Studies',
   );
   final jsonInputController = TextEditingController(
       text:
@@ -468,16 +468,6 @@ class _HomepageState extends State<Homepage> {
                       IconButton(
                         onPressed: () {
                           setState(() {
-                            for (var q in questions) {
-                              q.answerOptions?.shuffle();
-                            }
-                          });
-                        },
-                        icon: const Icon(Icons.question_answer),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
                             showDialog(
                               context: context,
                               builder: (context) {
@@ -628,10 +618,6 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.all(8),
                     //child: Text('Nothing to show'),
                     child: ListView.builder(
-                      // itemScrollController: itemScrollController,
-                      // scrollOffsetController: scrollOffsetController,
-                      // itemPositionsListener: itemPositionsListener,
-                      // scrollOffsetListener: scrollOffsetListener,
                       key: const PageStorageKey<String>('page'),
                       itemBuilder: (context, questionIndex) {
                         return ListTile(
@@ -649,128 +635,135 @@ class _HomepageState extends State<Homepage> {
                                 onPressed: () => deleteQuestion(questionIndex),
                                 icon: const Icon(Icons.delete_forever_rounded)),
                           ),
-                          subtitle: ListView.builder(
-                            key: UniqueKey(),
-                            shrinkWrap: true,
-                            physics: const ClampingScrollPhysics(),
-                            itemBuilder: (context, answerIndex) {
-                              int lastItemIndex = questions[questionIndex]
+                          subtitle: Column(
+                            children: [
+                              ...questions[questionIndex]
                                   .answerOptions!
-                                  .length;
-                              if (answerIndex == lastItemIndex) {
-                                final newAnswerController =
-                                    TextEditingController(
-                                  text: '',
-                                );
-
+                                  .map<Widget>((answer) {
                                 return ListTile(
+                                  leading: Container(
+                                    width: 8,
+                                    height: double.infinity,
+                                    color: answer.isCorrect ?? false
+                                        ? Colors.green
+                                        : Colors.red[100],
+                                  ),
                                   title: ListTile(
-                                    leading: const Text('Add new answer:'),
-                                    title: TextField(
-                                      controller: newAnswerController,
-                                    ),
-                                    trailing: ElevatedButton.icon(
+                                    leading: Switch(
+                                        value: answer.isCorrect ?? false,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            answer.isCorrect = value;
+                                          });
+                                        }),
+                                    title: Text(answer.body?.content ?? ''),
+                                    trailing: IconButton(
                                       onPressed: () {
                                         setState(() {
-                                          if (newAnswerController
-                                              .text.isNotEmpty) {
-                                            AnswerOptions newAns =
-                                                AnswerOptions();
-                                            newAns.isCorrect = false;
-                                            newAns.body = Body(
-                                                contentType: 'PLAIN',
-                                                content:
-                                                    newAnswerController.text);
-                                            questions[questionIndex]
-                                                .answerOptions
-                                                ?.add(newAns);
-                                          }
+                                          questions[questionIndex]
+                                              .answerOptions
+                                              ?.remove(answer);
                                         });
-                                        // Navigator.of(context).pop();
                                       },
                                       icon: const Icon(
-                                        Icons.add,
-                                        color: Colors.green,
+                                        Icons.remove_circle_outline,
+                                        color: Colors.red,
                                       ),
-                                      label: const Text('Add'),
                                     ),
                                   ),
                                 );
-                              }
-
-                              AnswerOptions answer = questions[questionIndex]
-                                  .answerOptions![answerIndex];
-                              final isCorrect = answer.isCorrect ?? false;
-                              return ListTile(
-                                leading: Container(
-                                  width: 8,
-                                  height: double.infinity,
-                                  color: isCorrect
-                                      ? Colors.green
-                                      : Colors.red[100],
-                                ),
-                                title: ListTile(
-                                  leading: Switch(
-                                      value: answer.isCorrect ?? false,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          answer.isCorrect = value;
-                                        });
-                                      }),
-                                  title: Text(answer.body?.content ?? ''),
-                                  trailing: IconButton(
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text(
-                                              'Delete',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
-                                            actions: [
-                                              FilledButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    questions[questionIndex]
-                                                        .answerOptions
-                                                        ?.remove(answer);
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                },
-                                                style: ButtonStyle(
-                                                    backgroundColor:
-                                                        WidgetStateProperty
-                                                            .resolveWith(
-                                                  (states) => Colors.red,
-                                                )),
-                                                child: const Text('Delete'),
-                                              ),
-                                            ],
-                                            icon: const Icon(
-                                              Icons.warning,
-                                              color: Colors.red,
-                                              size: 48,
-                                            ),
-                                            content: const Text(
-                                                'Confirm to delete this answer from the question.'),
-                                          );
-                                        },
-                                      );
-                                    },
-                                    icon: const Icon(
-                                      Icons.remove_circle_outline,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            itemCount:
-                                questions[questionIndex].answerOptions!.length +
-                                    1,
+                              }).toList(),
+                            ],
                           ),
+                          // subtitle: ListView.builder(
+                          //   key: UniqueKey(),
+                          //   shrinkWrap: true,
+                          //   // physics: PageScrollPhysics(),
+                          //   itemBuilder: (context, answerIndex) {
+                          //     int lastItemIndex = questions[questionIndex]
+                          //         .answerOptions!
+                          //         .length;
+                          //     if (answerIndex == lastItemIndex) {
+                          //       final newAnswerController =
+                          //           TextEditingController(
+                          //         text: '',
+                          //       );
+                          //
+                          //       return ListTile(
+                          //         title: ListTile(
+                          //           leading: const Text('Add new answer:'),
+                          //           title: TextField(
+                          //             controller: newAnswerController,
+                          //           ),
+                          //           trailing: ElevatedButton.icon(
+                          //             onPressed: () {
+                          //               setState(() {
+                          //                 if (newAnswerController
+                          //                     .text.isNotEmpty) {
+                          //                   AnswerOptions newAns =
+                          //                       AnswerOptions();
+                          //                   newAns.isCorrect = false;
+                          //                   newAns.body = Body(
+                          //                       contentType: 'PLAIN',
+                          //                       content:
+                          //                           newAnswerController.text);
+                          //                   questions[questionIndex]
+                          //                       .answerOptions
+                          //                       ?.add(newAns);
+                          //                 }
+                          //               });
+                          //               // Navigator.of(context).pop();
+                          //             },
+                          //             icon: const Icon(
+                          //               Icons.add,
+                          //               color: Colors.green,
+                          //             ),
+                          //             label: const Text('Add'),
+                          //           ),
+                          //         ),
+                          //       );
+                          //     }
+                          //
+                          //     AnswerOptions answer = questions[questionIndex]
+                          //         .answerOptions![answerIndex];
+                          //     final isCorrect = answer.isCorrect ?? false;
+                          //     return ListTile(
+                          //       leading: Container(
+                          //         width: 8,
+                          //         height: double.infinity,
+                          //         color: isCorrect
+                          //             ? Colors.green
+                          //             : Colors.red[100],
+                          //       ),
+                          //       title: ListTile(
+                          //         leading: Switch(
+                          //             value: answer.isCorrect ?? false,
+                          //             onChanged: (value) {
+                          //               setState(() {
+                          //                 answer.isCorrect = value;
+                          //               });
+                          //             }),
+                          //         title: Text(answer.body?.content ?? ''),
+                          //         trailing: IconButton(
+                          //           onPressed: () {
+                          //             setState(() {
+                          //               questions[questionIndex]
+                          //                   .answerOptions
+                          //                   ?.remove(answer);
+                          //             });
+                          //           },
+                          //           icon: const Icon(
+                          //             Icons.remove_circle_outline,
+                          //             color: Colors.red,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     );
+                          //   },
+                          //   itemCount:
+                          //       questions[questionIndex].answerOptions!.length +
+                          //           1,
+                          // ),
                         );
                       },
                       itemCount: questions.length,
@@ -783,6 +776,7 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
     ];
+
     return SafeArea(
       child: Scaffold(
           drawer: Drawer(
@@ -989,15 +983,15 @@ class _HomepageState extends State<Homepage> {
     String delimiter = ',,,';
     List<String> lists = input.split('\n');
     String joint = '';
-    lists.forEach((s) {
+    for (var s in lists) {
       s = s.replaceAll(RegExp(r',,,,'), delimiter);
       if (!s.contains(',,,')) {
         if (s.contains(',,')) {
           s = s.replaceAll(RegExp(r',,'), delimiter);
         }
       }
-      joint = joint + '\n$s';
-    });
+      joint = '$joint\n$s';
+    }
 
     input = joint;
 
@@ -1022,7 +1016,6 @@ class _HomepageState extends State<Homepage> {
       Body qBody = Body(contentType: 'PLAIN', content: '${row[0]}');
       q.body = qBody;
       q.answerOptions = [];
-      bool shuffleAnswers = true;
 
       for (int i = 1; i < row.length; i++) {
         // create answer option.
@@ -1033,15 +1026,6 @@ class _HomepageState extends State<Homepage> {
             isCorrect: false);
         // check if the answer is already added.
 
-        String all = 'all of the above';
-        String none = 'none of the above';
-        String allThese = "all of these";
-        String noneThese = 'none of these';
-        String? ans = answer.body?.content.toString().toLowerCase();
-
-        if (ans == all || ans == none || ans == allThese || ans == noneThese) {
-          shuffleAnswers = false;
-        }
         if (containsAnswer(q.answerOptions ?? [], answer.body!.content)) {
           for (int i = 0; i < q.answerOptions!.length; i++) {
             if (q.answerOptions?[i].body?.content == answer.body?.content) {
@@ -1072,9 +1056,7 @@ class _HomepageState extends State<Homepage> {
       q.assignedPoints = 1;
       q.status = 'ACTIVE';
 
-      if (shuffleAnswers) {
-        q.answerOptions?.shuffle();
-      }
+      shuffleAnswers(q.answerOptions);
 
       temp.add(q);
     }
@@ -1209,6 +1191,26 @@ class _HomepageState extends State<Homepage> {
         );
       },
     );
+  }
+
+  void shuffleAnswers(List<AnswerOptions>? answerOptions) {
+    String all = 'all';
+    String none = 'none';
+    String both = "both";
+    String neither = 'neither';
+    bool shuffleAnswers = true;
+    for (int i = 0; i < answerOptions!.length; i++) {
+      String ans =
+          answerOptions[i].body?.content.toString().toLowerCase() ?? "";
+      if (ans.contains(all) ||
+          ans.contains(none) ||
+          ans.contains(both) ||
+          ans.contains(neither)) {
+        shuffleAnswers = false;
+        return;
+      }
+    }
+    answerOptions.shuffle();
   }
 }
 

@@ -1,16 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mcqs_moderator_app/functions/save.dart';
 import 'package:mcqs_moderator_app/widgets/ai_widget.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../models.dart';
 
@@ -529,7 +526,7 @@ class _HomepageState extends State<Homepage> {
                       ),
                       const Spacer(),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(4.0),
                         child: SizedBox(
                           width: 120,
                           height: 40,
@@ -560,62 +557,14 @@ class _HomepageState extends State<Homepage> {
                       ),
                       if (!kIsWeb)
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: SizedBox(
-                            width: 120,
+                            width: 118,
                             height: 40,
                             child: MaterialButton(
-                              onPressed: () async {
-                                String? selectedDirectory =
-                                    await FilePicker.platform.getDirectoryPath(
-                                  dialogTitle:
-                                      'Choose a location to save the file',
-                                );
-                                if (selectedDirectory == null) {
-                                  //user canceled the picker
-                                  return;
-                                }
-
-                                // Create a file in the selected directory
-                                String filePath =
-                                    '$selectedDirectory/subject_$subjectID-topic_$topicID-questions_${questions.length}.json'
-                                        .toLowerCase();
-
-                                File file = File(filePath);
-
-                                await file.writeAsString(jsonEncode(questions));
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Examiter'),
-                                      icon: const Icon(
-                                        Icons.download_for_offline_sharp,
-                                        color: Colors.green,
-                                      ),
-                                      content: Column(
-                                        children: [
-                                          const Text('File saved successfully'),
-                                          TextButton(
-                                              onPressed: () {
-                                                Uri uri = Uri.file(filePath);
-                                                launchUrl(uri);
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text(filePath)),
-                                        ],
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: const Text('OK'))
-                                      ],
-                                    );
-                                  },
-                                );
-
-                                // jsonFileIo.writeJson('$subjectID-$topicID', jsonEncode(questions));
+                              onPressed: () {
+                                Save.saveMCQs(subjectID, topicID, questions,
+                                    context, true);
                               },
                               color: Colors.green,
                               child: const Row(
@@ -629,6 +578,36 @@ class _HomepageState extends State<Homepage> {
                                   ),
                                   Text(
                                     'Save JSON',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (!kIsWeb)
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: SizedBox(
+                            width: 125,
+                            height: 40,
+                            child: MaterialButton(
+                              onPressed: () {
+                                Save.saveMCQs(subjectID, topicID, questions,
+                                    context, false);
+                              },
+                              color: Colors.green,
+                              child: const Row(
+                                children: [
+                                  Icon(
+                                    Icons.save,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    'Save As Text',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ],
@@ -1008,16 +987,20 @@ class _HomepageState extends State<Homepage> {
     List<Question> temp = [];
 
     String delimiter = ',,,';
+    List<String> lists = input.split('\n');
+    String joint = '';
+    lists.forEach((s) {
+      s = s.replaceAll(RegExp(r',,,,'), delimiter);
+      if (!s.contains(',,,')) {
+        if (s.contains(',,')) {
+          s = s.replaceAll(RegExp(r',,'), delimiter);
+        }
+      }
+      joint = joint + '\n$s';
+    });
 
-    if (input.contains(',,,,')) {
-      delimiter = ',,,,';
-    } else if (input.contains(',,,')) {
-      delimiter = ',,,';
-    } else if (input.contains(',,')) {
-      delimiter = ',,';
-    }
+    input = joint;
 
-    input.replaceAll('\n', '');
     List<List<dynamic>> rows = const CsvToListConverter().convert(
       input,
       fieldDelimiter: delimiter,

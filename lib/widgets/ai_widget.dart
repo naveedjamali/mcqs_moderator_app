@@ -131,13 +131,27 @@ class _AiWidgetState extends State<AiWidget> {
 
     askAI(ins, keywords).then((desc) {
       if (desc != null) {
-        getCsvResponse(desc).then(
-          (csv) {
-            widget.setCSV(csv);
-            widget.addQuestions();
-            widget.setResponseLoading(false);
-          },
-        );
+        if (desc ==
+            "GenerativeAIException: Candidate was blocked due to recitation") {
+          showDialog(
+              context: context,
+              builder: (context) {
+                widget.setResponseLoading(false);
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text(
+                      'GenerativeAIException: Candidate was blocked due to recitation'),
+                );
+              });
+        } else {
+          getCsvResponse(desc).then(
+            (csv) {
+              widget.setCSV(csv);
+              widget.addQuestions();
+              widget.setResponseLoading(false);
+            },
+          );
+        }
       }
     });
   }

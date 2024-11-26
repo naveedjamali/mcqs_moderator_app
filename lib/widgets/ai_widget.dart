@@ -127,7 +127,7 @@ class _AiWidgetState extends State<AiWidget> {
       TextPart('essay length: 2000 words minimum'),
       TextPart('essay type: in-depth'),
       TextPart(
-          'include: history, actions, reactions, parts, sub-parts, examples, formulas, measurements, structure, importance, inventions, discoveries, scientists, artists, uses, involvements, dates, types, subtypes, etc'),
+          'essay includes: history, actions, reactions, parts, sub-parts, examples, formulas, measurements, structure, importance, inventions, discoveries, scientists, artists, uses, involvements, dates, types, subtypes, etc'),
     ]);
 
     askAI(ins, keywords).then((desc) {
@@ -163,7 +163,9 @@ class _AiWidgetState extends State<AiWidget> {
         TextPart(
             'CSV output format: Question ,,, Option1 ,,, Option2 ,,, Option3 ,,, Option4 ,,, CorrectAnswer'),
         TextPart('Generate minimum 30 MCQss in the csv format'),
-        TextPart('use three commas \',,,\' as delimiter')
+        TextPart('use three commas \',,,\' as delimiter'),
+        TextPart(
+            'reconfirm that CSV values are separated with three commas ,,, '),
       ],
     );
     String? csv = await askAI(ins, description);

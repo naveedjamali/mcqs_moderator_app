@@ -105,7 +105,7 @@ class _AiWidgetState extends State<AiWidget> {
                     }
                   },
                   decoration: const InputDecoration(
-                    labelText: 'Enter your keywords',
+                    labelText: 'Enter your keywords and press Enter',
                   ),
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
@@ -119,20 +119,20 @@ class _AiWidgetState extends State<AiWidget> {
     );
   }
 
-  void getAIDescription(String keywords) async {
-    final ins = Content.multi([
+  void getAIDescription(String searchKeywords) async {
+    final instructions = Content.multi([
       TextPart('Subject: ${widget.subject}'),
       TextPart('Topic: ${widget.topic}'),
       TextPart('Generate a detailed essay on the given topic'),
       TextPart('essay length: 2000 words minimum'),
       TextPart('essay type: in-depth'),
       TextPart(
-          'essay includes: history, actions, reactions, parts, sub-parts, examples, formulas, measurements, structure, importance, inventions, discoveries, scientists, artists, uses, involvements, dates, types, subtypes, etc'),
+          'The Essay includes: history, actions, reactions, parts, sub-parts, examples, formulas, measurements, structure, importance, inventions, discoveries, scientists, artists, uses, involvements, dates, types, subtypes, etc'),
     ]);
 
-    askAI(ins, keywords).then((desc) {
-      if (desc != null) {
-        if (desc ==
+    askAI(instructions, searchKeywords).then((generatedDescription) {
+      if (generatedDescription != null) {
+        if (generatedDescription ==
             "GenerativeAIException: Candidate was blocked due to recitation") {
           showDialog(
               context: context,
@@ -145,7 +145,7 @@ class _AiWidgetState extends State<AiWidget> {
                 );
               });
         } else {
-          getCsvResponse(desc).then(
+          getCsvResponse(generatedDescription).then(
             (csv) {
               widget.setCSV(csv);
               widget.addQuestions();

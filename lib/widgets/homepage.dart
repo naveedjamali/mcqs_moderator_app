@@ -6,10 +6,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/functions/save.dart';
+import 'package:mcqs_moderator_app/models.dart';
+import 'package:mcqs_moderator_app/widgets/add_answer_widget.dart';
 import 'package:mcqs_moderator_app/widgets/ai_widget.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import '../models.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -636,6 +636,7 @@ class _HomepageState extends State<Homepage> {
                                 icon: const Icon(Icons.delete_forever_rounded)),
                           ),
                           subtitle: Column(
+                            key: UniqueKey(),
                             children: [
                               ...questions[questionIndex]
                                   .answerOptions!
@@ -672,7 +673,11 @@ class _HomepageState extends State<Homepage> {
                                     ),
                                   ),
                                 );
-                              }).toList(),
+                              }),
+                              AddAnswerWidget(
+                                question: questions[questionIndex],
+                                key: UniqueKey(),
+                              ),
                             ],
                           ),
                           // subtitle: ListView.builder(

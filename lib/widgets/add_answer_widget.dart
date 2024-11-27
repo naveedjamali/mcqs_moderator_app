@@ -1,0 +1,49 @@
+import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:mcqs_moderator_app/models.dart';
+
+class AddAnswerWidget extends StatefulWidget {
+  const AddAnswerWidget({required this.question, super.key});
+
+  final Question question;
+
+  @override
+  State<AddAnswerWidget> createState() => _AddAnswerWidgetState();
+}
+
+class _AddAnswerWidgetState extends State<AddAnswerWidget> {
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController newAnswerController = TextEditingController();
+    return ListTile(
+      title: ListTile(
+        leading: const Text('Add new answer:'),
+        title: TextField(
+          controller: newAnswerController,
+        ),
+        trailing: ElevatedButton.icon(
+          onPressed: () {
+            if (newAnswerController.text.isNotEmpty) {
+              AnswerOptions newAns = AnswerOptions();
+              newAns.isCorrect = false;
+              newAns.body =
+                  Body(contentType: 'PLAIN', content: newAnswerController.text);
+              setState(() {
+                widget.question.answerOptions?.add(newAns);
+              });
+            }
+            setState(() {
+              log('Answer added');
+            });
+          },
+          icon: const Icon(
+            Icons.add,
+            color: Colors.green,
+          ),
+          label: const Text('Add'),
+        ),
+      ),
+    );
+  }
+}

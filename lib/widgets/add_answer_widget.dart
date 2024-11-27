@@ -21,9 +21,8 @@ class _AddAnswerWidgetState extends State<AddAnswerWidget> {
         leading: const Text('Add new answer:'),
         title: TextField(
           controller: newAnswerController,
-        ),
-        trailing: ElevatedButton.icon(
-          onPressed: () {
+          textInputAction: TextInputAction.go,
+          onSubmitted: (value) {
             if (newAnswerController.text.isNotEmpty) {
               AnswerOptions newAns = AnswerOptions();
               newAns.isCorrect = false;
@@ -37,11 +36,6 @@ class _AddAnswerWidgetState extends State<AddAnswerWidget> {
               log('Answer added');
             });
           },
-          icon: const Icon(
-            Icons.add,
-            color: Colors.green,
-          ),
-          label: const Text('Add'),
         ),
       ),
     );

@@ -7,6 +7,47 @@ import 'package:mcqs_moderator_app/models.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Save {
+  static String questionToText(
+    String subjectID,
+    String topicID,
+    List<Question> questions,
+  ) {
+    const options = [
+      '(A)',
+      '(B)',
+      '(C)',
+      '(D)',
+      '(E)',
+      '(F)',
+      '(G)',
+      '(H)',
+      '(I)',
+      '(J)',
+      '(K)',
+    ];
+    String mcqs =
+        "Subject: $subjectID, Topic: $topicID, total questions: ${questions.length}\n";
+    String keys = "\n\nKeys of correct Answers\n\n";
+
+    for (int i = 0; i < questions.length; i++) {
+      String q = "\n\nQ# ${i + 1}: ${questions[i].body?.content.toString()}\n";
+
+      int totalAnswers = questions[i].answerOptions!.length;
+      for (int j = 0; j < totalAnswers; j++) {
+        q +=
+            "\n\t${options[j]}: ${questions[i].answerOptions?[j].body?.content.toString()}";
+        if (questions[i].answerOptions![j].isCorrect ?? false) {
+          keys +=
+              "Q# ${i + 1}: ${options[j]} ${questions[i].answerOptions?[j].body?.content.toString()}\n";
+        }
+      }
+      mcqs += q;
+    }
+
+    final allText = mcqs + keys;
+    return allText;
+  }
+
   static Function saveMCQs = (String subjectID, String topicID,
       List<Question> questions, BuildContext context, bool saveAsJSON) async {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath(
@@ -27,41 +68,7 @@ class Save {
     if (saveAsJSON) {
       await file.writeAsString(jsonEncode(questions));
     } else {
-      const options = [
-        '(A)',
-        '(B)',
-        '(C)',
-        '(D)',
-        '(E)',
-        '(F)',
-        '(G)',
-        '(H)',
-        '(I)',
-        '(J)',
-        '(K)',
-      ];
-      String mcqs =
-          "Subject: $subjectID, Topic: $topicID, total questions: ${questions.length}\n";
-      String keys = "\n\nKeys of correct Answers\n\n";
-
-      for (int i = 0; i < questions.length; i++) {
-        String q =
-            "\n\nQ# ${i + 1}: ${questions[i].body?.content.toString()}\n";
-
-        int totalAnswers = questions[i].answerOptions!.length;
-        for (int j = 0; j < totalAnswers; j++) {
-          q +=
-              "\n\t${options[j]}: ${questions[i].answerOptions?[j].body?.content.toString()}";
-          if (questions[i].answerOptions![j].isCorrect ?? false) {
-            keys +=
-                "Q# ${i + 1}: ${options[j]} ${questions[i].answerOptions?[j].body?.content.toString()}\n";
-          }
-        }
-        mcqs += q;
-      }
-
-      final allText = mcqs + keys;
-      await file.writeAsString(allText);
+      await file.writeAsString(questionToText(subjectID, topicID, questions));
     }
     showDialog(
       context: context,

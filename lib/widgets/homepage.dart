@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mcqs_moderator_app/functions/save.dart';
 import 'package:mcqs_moderator_app/models.dart';
-import 'package:mcqs_moderator_app/widgets/add_answer_widget.dart';
 import 'package:mcqs_moderator_app/widgets/ai_widget.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -523,6 +522,37 @@ class _HomepageState extends State<Homepage> {
                           child: MaterialButton(
                             // icon: const Icon(Icons.copy, color: Colors.green,),
                             onPressed: () async {
+                              await Clipboard.setData(ClipboardData(
+                                  text: Save.questionToText(
+                                      subjectID, topicID, questions)));
+                            },
+                            color: Colors.green,
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.copy,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  'Copy Text',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: SizedBox(
+                          width: 120,
+                          height: 40,
+                          child: MaterialButton(
+                            // icon: const Icon(Icons.copy, color: Colors.green,),
+                            onPressed: () async {
                               await Clipboard.setData(
                                   ClipboardData(text: jsonEncode(questions)));
                             },
@@ -635,140 +665,89 @@ class _HomepageState extends State<Homepage> {
                                 onPressed: () => deleteQuestion(questionIndex),
                                 icon: const Icon(Icons.delete_forever_rounded)),
                           ),
-                          subtitle: Column(
+                          subtitle: ListView.builder(
                             key: UniqueKey(),
-                            children: [
-                              ...questions[questionIndex]
+                            shrinkWrap: true,
+                            // physics: PageScrollPhysics(),
+                            itemBuilder: (context, answerIndex) {
+                              int lastItemIndex = questions[questionIndex]
                                   .answerOptions!
-                                  .map<Widget>((answer) {
+                                  .length;
+                              if (answerIndex == lastItemIndex) {
+                                final newAnswerController =
+                                    TextEditingController(
+                                  text: '',
+                                );
+
                                 return ListTile(
-                                  leading: Container(
-                                    width: 8,
-                                    height: double.infinity,
-                                    color: answer.isCorrect ?? false
-                                        ? Colors.green
-                                        : Colors.red[100],
-                                  ),
                                   title: ListTile(
-                                    leading: Switch(
-                                        value: answer.isCorrect ?? false,
-                                        onChanged: (value) {
+                                    leading: const Text(
+                                        'Add new answer and press Enter:'),
+                                    title: TextField(
+                                      textInputAction: TextInputAction.go,
+                                      controller: newAnswerController,
+                                      onSubmitted: (value) {
+                                        if (newAnswerController
+                                            .text.isNotEmpty) {
+                                          AnswerOptions newAns =
+                                              AnswerOptions();
+                                          newAns.isCorrect = false;
+                                          newAns.body = Body(
+                                              contentType: 'PLAIN',
+                                              content:
+                                                  newAnswerController.text);
                                           setState(() {
-                                            answer.isCorrect = value;
+                                            questions[questionIndex]
+                                                .answerOptions
+                                                ?.add(newAns);
                                           });
-                                        }),
-                                    title: Text(answer.body?.content ?? ''),
-                                    trailing: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          questions[questionIndex]
-                                              .answerOptions
-                                              ?.remove(answer);
-                                        });
+                                        }
                                       },
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                        color: Colors.red,
-                                      ),
                                     ),
                                   ),
                                 );
-                              }),
-                              AddAnswerWidget(
-                                question: questions[questionIndex],
-                                key: UniqueKey(),
-                              ),
-                            ],
+                              }
+
+                              AnswerOptions answer = questions[questionIndex]
+                                  .answerOptions![answerIndex];
+                              final isCorrect = answer.isCorrect ?? false;
+                              return ListTile(
+                                leading: Container(
+                                  width: 8,
+                                  height: double.infinity,
+                                  color: isCorrect
+                                      ? Colors.green
+                                      : Colors.red[100],
+                                ),
+                                title: ListTile(
+                                  leading: Switch(
+                                      value: answer.isCorrect ?? false,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          answer.isCorrect = value;
+                                        });
+                                      }),
+                                  title: Text(answer.body?.content ?? ''),
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        questions[questionIndex]
+                                            .answerOptions
+                                            ?.remove(answer);
+                                      });
+                                    },
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount:
+                                questions[questionIndex].answerOptions!.length +
+                                    1,
                           ),
-                          // subtitle: ListView.builder(
-                          //   key: UniqueKey(),
-                          //   shrinkWrap: true,
-                          //   // physics: PageScrollPhysics(),
-                          //   itemBuilder: (context, answerIndex) {
-                          //     int lastItemIndex = questions[questionIndex]
-                          //         .answerOptions!
-                          //         .length;
-                          //     if (answerIndex == lastItemIndex) {
-                          //       final newAnswerController =
-                          //           TextEditingController(
-                          //         text: '',
-                          //       );
-                          //
-                          //       return ListTile(
-                          //         title: ListTile(
-                          //           leading: const Text('Add new answer:'),
-                          //           title: TextField(
-                          //             controller: newAnswerController,
-                          //           ),
-                          //           trailing: ElevatedButton.icon(
-                          //             onPressed: () {
-                          //               setState(() {
-                          //                 if (newAnswerController
-                          //                     .text.isNotEmpty) {
-                          //                   AnswerOptions newAns =
-                          //                       AnswerOptions();
-                          //                   newAns.isCorrect = false;
-                          //                   newAns.body = Body(
-                          //                       contentType: 'PLAIN',
-                          //                       content:
-                          //                           newAnswerController.text);
-                          //                   questions[questionIndex]
-                          //                       .answerOptions
-                          //                       ?.add(newAns);
-                          //                 }
-                          //               });
-                          //               // Navigator.of(context).pop();
-                          //             },
-                          //             icon: const Icon(
-                          //               Icons.add,
-                          //               color: Colors.green,
-                          //             ),
-                          //             label: const Text('Add'),
-                          //           ),
-                          //         ),
-                          //       );
-                          //     }
-                          //
-                          //     AnswerOptions answer = questions[questionIndex]
-                          //         .answerOptions![answerIndex];
-                          //     final isCorrect = answer.isCorrect ?? false;
-                          //     return ListTile(
-                          //       leading: Container(
-                          //         width: 8,
-                          //         height: double.infinity,
-                          //         color: isCorrect
-                          //             ? Colors.green
-                          //             : Colors.red[100],
-                          //       ),
-                          //       title: ListTile(
-                          //         leading: Switch(
-                          //             value: answer.isCorrect ?? false,
-                          //             onChanged: (value) {
-                          //               setState(() {
-                          //                 answer.isCorrect = value;
-                          //               });
-                          //             }),
-                          //         title: Text(answer.body?.content ?? ''),
-                          //         trailing: IconButton(
-                          //           onPressed: () {
-                          //             setState(() {
-                          //               questions[questionIndex]
-                          //                   .answerOptions
-                          //                   ?.remove(answer);
-                          //             });
-                          //           },
-                          //           icon: const Icon(
-                          //             Icons.remove_circle_outline,
-                          //             color: Colors.red,
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     );
-                          //   },
-                          //   itemCount:
-                          //       questions[questionIndex].answerOptions!.length +
-                          //           1,
-                          // ),
                         );
                       },
                       itemCount: questions.length,
@@ -1216,6 +1195,39 @@ class _HomepageState extends State<Homepage> {
       }
     }
     answerOptions.shuffle();
+  }
+
+  Iterable<Widget> getAnswerList(List<Question> questions, int questionIndex) {
+    return questions[questionIndex].answerOptions!.map<Widget>((answer) {
+      return ListTile(
+        leading: Container(
+          width: 8,
+          height: double.infinity,
+          color: answer.isCorrect ?? false ? Colors.green : Colors.red[100],
+        ),
+        title: ListTile(
+          leading: Switch(
+              value: answer.isCorrect ?? false,
+              onChanged: (value) {
+                setState(() {
+                  answer.isCorrect = value;
+                });
+              }),
+          title: Text(answer.body?.content ?? ''),
+          trailing: IconButton(
+            onPressed: () {
+              setState(() {
+                questions[questionIndex].answerOptions?.remove(answer);
+              });
+            },
+            icon: const Icon(
+              Icons.remove_circle_outline,
+              color: Colors.red,
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 

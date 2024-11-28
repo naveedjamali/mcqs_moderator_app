@@ -137,7 +137,10 @@ class _AiWidgetState extends State<AiWidget> {
           showDialog(
               context: context,
               builder: (context) {
-                widget.setResponseLoading(false);
+                setState(() {
+                  widget.setResponseLoading(false);
+                });
+
                 return AlertDialog(
                   title: Text('Error'),
                   content: Text(
@@ -149,7 +152,9 @@ class _AiWidgetState extends State<AiWidget> {
             (csv) {
               widget.setCSV(csv);
               widget.addQuestions();
-              widget.setResponseLoading(false);
+              setState(() {
+                widget.setResponseLoading(false);
+              });
             },
           );
         }
@@ -160,15 +165,22 @@ class _AiWidgetState extends State<AiWidget> {
   Future<String?> getCsvResponse(String description) async {
     final ins = Content.multi(
       [
-        TextPart(
-            'CSV output format: Question ,,, Option1 ,,, Option2 ,,, Option3 ,,, Option4 ,,, CorrectAnswer'),
         TextPart('Generate minimum 30 MCQss in the csv format'),
         TextPart('use three commas \',,,\' as delimiter'),
         TextPart(
             'reconfirm that CSV values are separated with three commas ,,, '),
+        TextPart(
+            'CSV output format: Question ,,, Option1 ,,, Option2 ,,, Option3 ,,, Option4 ,,, CorrectAnswer'),
+        TextPart(
+            'Example correct output: What is the capital of Pakistan ,,, Hyderabad ,,, Karachi ,,, Islamabad ,,, Peshawar ,,, Islamabad'),
+        TextPart(
+            'Example incorrect output: What is the capital of Pakistan ,,, Hyderabad ,,, Karachi ,,, Islamabad ,,, Peshawar ,,, C'),
+        TextPart(
+            'Example incorrect output with two commas as delimiter: What is the capital of Pakistan ,, Hyderabad ,, Karachi ,, Islamabad ,, Peshawar ,, Islamabad'),
       ],
     );
     String? csv = await askAI(ins, description);
+    print(csv);
     return csv;
   }
 

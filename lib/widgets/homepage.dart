@@ -896,9 +896,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   void setGeneratingResponse(bool value) {
-    setState(() {
-      generatingResponse = value;
-    });
+    generatingResponse = value;
   }
 
   addEntry(String entry) {

@@ -40,7 +40,9 @@ class _AiWidgetState extends State<AiWidget> {
           children: [
             TextButton.icon(
               onPressed: () {
-                widget.clearEntries();
+                setState(() {
+                  widget.clearEntries();
+                });
               },
               label: const Text('Clear keywords'),
               icon: const Icon(
@@ -165,7 +167,7 @@ class _AiWidgetState extends State<AiWidget> {
   Future<String?> getCsvResponse(String description) async {
     final ins = Content.multi(
       [
-        TextPart('Generate minimum 30 MCQss in the csv format'),
+        TextPart('Generate minimum 60 MCQss in the csv format'),
         TextPart('use three commas \',,,\' as delimiter'),
         TextPart(
             'reconfirm that CSV values are separated with three commas ,,, '),
@@ -180,7 +182,6 @@ class _AiWidgetState extends State<AiWidget> {
       ],
     );
     String? csv = await askAI(ins, description);
-    print(csv);
     return csv;
   }
 

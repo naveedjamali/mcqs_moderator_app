@@ -466,50 +466,48 @@ class _HomepageState extends State<Homepage> {
                       ),
                       IconButton(
                         onPressed: () {
-                          setState(() {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog.adaptive(
-                                  icon: const Icon(
-                                    Icons.warning,
-                                    color: Colors.red,
-                                  ),
-                                  content: Text(
-                                      'Do you want to remove all the ${questions.length} questions from the list?'),
-                                  title: const Text('Warning'),
-                                  actions: [
-                                    FilledButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text('No')),
-                                    FilledButton(
-                                        style: ButtonStyle(
-                                          foregroundColor:
-                                              WidgetStateColor.resolveWith(
-                                            (states) {
-                                              return Colors.white;
-                                            },
-                                          ),
-                                          backgroundColor:
-                                              WidgetStateColor.resolveWith(
-                                            (states) {
-                                              return Colors.red;
-                                            },
-                                          ),
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog.adaptive(
+                                icon: const Icon(
+                                  Icons.warning,
+                                  color: Colors.red,
+                                ),
+                                content: Text(
+                                    'Do you want to remove all the ${questions.length} questions from the list?'),
+                                title: const Text('Warning'),
+                                actions: [
+                                  FilledButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: const Text('No')),
+                                  FilledButton(
+                                      style: ButtonStyle(
+                                        foregroundColor:
+                                            WidgetStateColor.resolveWith(
+                                          (states) {
+                                            return Colors.white;
+                                          },
                                         ),
-                                        onPressed: () => setState(() {
-                                              questions.clear();
-                                              Navigator.of(context).pop();
-                                            }),
-                                        child: const Text(
-                                          'Yes',
-                                        ))
-                                  ],
-                                );
-                              },
-                            );
-                          });
+                                        backgroundColor:
+                                            WidgetStateColor.resolveWith(
+                                          (states) {
+                                            return Colors.red;
+                                          },
+                                        ),
+                                      ),
+                                      onPressed: () => setState(() {
+                                            questions.clear();
+                                            Navigator.of(context).pop();
+                                          }),
+                                      child: const Text(
+                                        'Yes',
+                                      ))
+                                ],
+                              );
+                            },
+                          );
                         },
                         icon: const Icon(Icons.clear),
                       ),
@@ -1052,29 +1050,27 @@ class _HomepageState extends State<Homepage> {
 
     if (kDebugMode) {
       print(questions.length);
-      print(json.encode(questions));
+      print(json.encode(temp));
     }
-    setState(() {
-      // jsonInputController.text = "";
-      ScaffoldMessenger.of(context).showSnackBar(
-        snackBarAnimationStyle: AnimationStyle(
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeIn,
-            reverseCurve: Curves.bounceIn,
-            reverseDuration: const Duration(seconds: 1)),
-        SnackBar(
-          duration: const Duration(seconds: 2),
-          content: Text('$addedQuestionCount new questions added successfully'),
-          width: 600,
-          backgroundColor: Colors.green,
-          padding: const EdgeInsets.all(16),
-          behavior: SnackBarBehavior.floating,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          dismissDirection: DismissDirection.horizontal,
-          showCloseIcon: true,
-        ),
-      );
-    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      snackBarAnimationStyle: AnimationStyle(
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          reverseCurve: Curves.bounceIn,
+          reverseDuration: const Duration(seconds: 1)),
+      SnackBar(
+        duration: const Duration(seconds: 2),
+        content: Text('$addedQuestionCount new questions added successfully'),
+        width: 600,
+        backgroundColor: Colors.green,
+        padding: const EdgeInsets.all(16),
+        behavior: SnackBarBehavior.floating,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        dismissDirection: DismissDirection.horizontal,
+        showCloseIcon: true,
+      ),
+    );
   }
 
   bool containsAnswer(
@@ -1092,9 +1088,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   void clearEntries() {
-    setState(() {
-      entries.clear();
-    });
+    entries.clear();
   }
 
   void editQuestion(int questionIndex) {
@@ -1123,8 +1117,8 @@ class _HomepageState extends State<Homepage> {
               onPressed: () {
                 setState(() {
                   questions[questionIndex].body?.content = controller.text;
-                  Navigator.of(context).pop();
                 });
+                Navigator.of(context).pop();
               },
               label: const Text('Save'),
               icon: const Icon(
@@ -1159,9 +1153,8 @@ class _HomepageState extends State<Homepage> {
               onPressed: () {
                 setState(() {
                   questions.removeAt(questionIndex);
-
-                  Navigator.of(context).pop();
                 });
+                Navigator.of(context).pop();
               },
               label: const Text('Delete'),
               icon: const Icon(
